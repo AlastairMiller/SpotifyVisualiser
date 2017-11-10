@@ -12,6 +12,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
@@ -30,10 +33,13 @@ public class ArtistControllerTest {
     @Before
     public void init() throws MalformedURLException, URISyntaxException {
         MockitoAnnotations.initMocks(this);
+        ArrayList<String> genres = new ArrayList<String>();
+        genres.addAll(Arrays.asList("indie pop", "indie poptimism", "indietronica", "modern rock", "pop"));
+
         artist = new Artist(
                 "5ivCbtrcD5N4rD337xIb2z",
                 new URL("https://open.spotify.com/artist/5ivCbtrcD5N4rD337xIb2z"),
-                new String[]{"indie pop", "indie poptimism", "indietronica", "modern rock", "pop"},
+                genres,
                 "https://api.spotify.com/v1/artists/5ivCbtrcD5N4rD337xIb2z",
                 "MisterWives",
                 "artist",

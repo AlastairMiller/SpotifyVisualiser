@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 
 @Data
 @AllArgsConstructor
@@ -18,14 +19,14 @@ public class Playlist {
     @Id
     String id;
     URI uri;
-    URL[] externalURLs;
+    Collection<URL> externalURLs;
     Integer numOfFollowers;
     String href;
-    String[] images;
+    Collection<String> images;
     String name;
     @ManyToOne
     User owner;
     Boolean findable;
-    String snapshot_id;
+    String snapshotId;
     ArrayList<Song> tracks;
 }

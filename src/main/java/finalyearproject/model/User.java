@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 
 @Data
 @Entity
@@ -13,9 +14,9 @@ public class User {
     @Id
     String id;
     URI uri;
-    String display_Name;
-    URL[] external_Urls;
+    String displayName;
+    Collection<URL> externalUrls;
     Integer numOfFollowers;
     String href;
-    String[] images;
+    Collection<String> images;
 }

@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 
 @Data
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class Artist {
     @Id
     String id;
     URL externalURLs;
-    String[] genres;
+    Collection<String> genres;
     String href;
     String name;
     String type;

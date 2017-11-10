@@ -2,3 +2,4 @@
 .env
 .idea/
 /finalyearproject.iml
+/target/
