@@ -2,11 +2,10 @@ package finalyearproject.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collection;
+import java.util.ArrayList;
 
 @Data
 @Entity
@@ -15,8 +14,8 @@ public class User {
     String id;
     URI uri;
     String displayName;
-    Collection<URL> externalUrls;
+    URL externalUrl;
     Integer numOfFollowers;
     String href;
-    Collection<String> images;
+    ArrayList<String> images;
 }

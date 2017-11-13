@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,10 +18,10 @@ public class Playlist {
     @Id
     String id;
     URI uri;
-    Collection<URL> externalURLs;
+    URL externalURL;
     Integer numOfFollowers;
     String href;
-    Collection<String> images;
+    ArrayList<String> images;
     String name;
     @ManyToOne
     User owner;
