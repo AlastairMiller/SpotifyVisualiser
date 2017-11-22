@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "name": "clientSecret",
+      "type": "java.lang.String",
+      "description": "Description for clientSecret."
+    },
+    {
+      "name": "clientId",
+      "type": "java.lang.String",
+      "description": "Description for clientId."
+    },
+    {
+      "name": "redirectURI",
+      "type": "java.lang.String",
+      "description": "Description for redirectURI."
+    }
+  ] }

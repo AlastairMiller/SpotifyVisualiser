@@ -1,6 +1,7 @@
 package finalyearproject.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@Builder
 @Entity
 public class Playlist {
     @Id
@@ -21,11 +23,11 @@ public class Playlist {
     URL externalURL;
     Integer numOfFollowers;
     String href;
-    ArrayList<String> images;
+    @ElementCollection
+    List<String> images;
     String name;
     @ManyToOne
     User owner;
-    Boolean findable;
-    String snapshotId;
-    ArrayList<Song> tracks;
+    @ElementCollection
+    List<Song> tracks;
 }

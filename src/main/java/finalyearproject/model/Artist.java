@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.net.URI;
@@ -20,6 +21,7 @@ public class Artist {
     @Id
     String id;
     URL externalURL;
+    @ElementCollection
     List<String> genres;
     String href;
     String name;

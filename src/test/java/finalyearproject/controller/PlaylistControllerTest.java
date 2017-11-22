@@ -37,8 +37,6 @@ public class PlaylistControllerTest {
                 null,
                 "New Music Friday UK",
                 null,
-                true,
-                "xwO/oZuuxK0YCTkJdHGSEWuDySCrI0dVfKp4uBzsUqkiiXMYMM6ddK7923h58BwFyopvJ7S32xg=",
                 null
         );
     }
