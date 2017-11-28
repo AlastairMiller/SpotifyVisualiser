@@ -27,7 +27,7 @@ public class DownstreamMapper {
                 .discNum(fullTrack.getDiscNumber())
                 .durationMs(fullTrack.getDuration())
                 .explicit(fullTrack.isExplicit())
-                .externalURL((new URL(fullTrack.getExternalUrls().get("1"))))
+                .externalURL((new URL(fullTrack.getExternalUrls().get("spotify"))))
                 .href(fullTrack.getHref())
                 .name(fullTrack.getName())
                 .previewURL(new URL(fullTrack.getPreviewUrl()))
@@ -40,7 +40,7 @@ public class DownstreamMapper {
     public static Artist mapSimpleArtist(com.wrapper.spotify.models.SimpleArtist fullArtist) throws MalformedURLException {
         return Artist.builder()
                 .id(fullArtist.getId())
-                .externalURL((new URL(fullArtist.getExternalUrls().get("1"))))
+                .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
                 .href(fullArtist.getHref())
                 .name(fullArtist.getName())
                 .type(fullArtist.getType().getType())
@@ -51,7 +51,7 @@ public class DownstreamMapper {
     public static Artist mapArtist(com.wrapper.spotify.models.Artist fullArtist) throws MalformedURLException {
         return Artist.builder()
                 .id(fullArtist.getId())
-                .externalURL((new URL(fullArtist.getExternalUrls().get("1"))))
+                .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
                 .genres(fullArtist.getGenres())
                 .href(fullArtist.getHref())
                 .name(fullArtist.getName())
