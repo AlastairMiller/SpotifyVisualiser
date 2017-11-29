@@ -16,7 +16,7 @@ import java.util.List;
 public class DownstreamMapper {
 
     public static Song mapSong(Track fullTrack) throws MalformedURLException {
-        List<Artist> minimisedArtists = null;
+        List<Artist> minimisedArtists = new ArrayList<Artist>();
         for (int i = 0; i < fullTrack.getArtists().size(); i++) {
             minimisedArtists.add(mapSimpleArtist(fullTrack.getArtists().get(i)));
         }
