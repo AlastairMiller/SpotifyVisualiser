@@ -43,6 +43,8 @@ public class ArtistControllerTest {
                 "https://api.spotify.com/v1/artists/5ivCbtrcD5N4rD337xIb2z",
                 "MisterWives",
                 "artist",
+                266747,
+                70,
                 new URI("spotify:artist:5ivCbtrcD5N4rD337xIb2z"));
     }
 

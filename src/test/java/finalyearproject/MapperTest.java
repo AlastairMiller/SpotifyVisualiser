@@ -39,11 +39,11 @@ public class MapperTest {
                 ImageBuilder.getNewImage(300, 300, "https://i.scdn.co/image/7ad46eb909c9d472e8f9c02be988b4c00e2d2f9b"),
                 ImageBuilder.getNewImage(64, 64, "https://i.scdn.co/image/226910565e05223d962953b224f0d44133b978d0"))
         );
+
         strangersAlbum.setType(SpotifyEntityType.ALBUM);
         strangersAlbum.setUri("spotify:album:2zlcfXL0DThG4tcEzAIJOl");
         ExternalUrls albumExternalUrl = new ExternalUrls();
         Map<String, String> temp = Collections.singletonMap("spotify", "https://open.spotify.com/artist/4TrraAsitQKl821DQY42cZ");
-
         ReflectionTestUtils.setField(albumExternalUrl, "externalUrls", temp);
 
         simpleSigrid.setHref("https://api.spotify.com/v1/artists/4TrraAsitQKl821DQY42cZ");
@@ -51,12 +51,24 @@ public class MapperTest {
         simpleSigrid.setName("Sigrid");
         simpleSigrid.setType(SpotifyEntityType.ARTIST);
         simpleSigrid.setUri("spotify:artist:4TrraAsitQKl821DQY42cZ");
-
         ExternalUrls artistExternalUrl = new ExternalUrls();
         Map<String, String> temp2 = Collections.singletonMap("spotify", "https://open.spotify.com/artist/4TrraAsitQKl821DQY42cZ");
-
         ReflectionTestUtils.setField(artistExternalUrl, "externalUrls", temp2);
         simpleSigrid.setExternalUrls(artistExternalUrl);
+
+
+        fullSigrid.setExternalUrls(artistExternalUrl);
+        fullSigrid.setFollowers(new Followers(){{
+            setHref(null);
+            setTotal(54208);
+        }});
+        fullSigrid.setGenres(Arrays.asList("norwegian indie", "pop", "tropical house"));
+        fullSigrid.setHref("https://api.spotify.com/v1/artists/4TrraAsitQKl821DQY42cZ");
+        fullSigrid.setId("4TrraAsitQKl821DQY42cZ");
+        fullSigrid.setName("Sigrid");
+        fullSigrid.setPopularity(73);
+        fullSigrid.setType(SpotifyEntityType.ARTIST);
+        fullSigrid.setUri("spotify:artist:4TrraAsitQKl821DQY42cZ");
 
         strangers.setAlbum(strangersAlbum);
         strangers.setArtists(new ArrayList<SimpleArtist>(Collections.singletonList(simpleSigrid)));
@@ -99,27 +111,26 @@ public class MapperTest {
 
     @Test
     public void mapSimpleArtistCorrectly() throws MalformedURLException {
-        finalyearproject.model.Artist mappedSong = DownstreamMapper.mapSimpleArtist(simpleSigrid);
-        assertEquals(simpleSigrid.getHref(),mappedSong.getHref());
-        assertEquals(simpleSigrid.getId(),mappedSong.getId());
-        assertEquals(simpleSigrid.getName(),mappedSong.getName());
-        assertEquals(simpleSigrid.getType().toString(), mappedSong.getType());
-        assertEquals(simpleSigrid.getUri(), mappedSong.getUri().toString());
-        assertEquals(simpleSigrid.getExternalUrls().get("spotify"), mappedSong.getExternalURL().toString());
+        finalyearproject.model.Artist mappedArtist = DownstreamMapper.mapSimpleArtist(simpleSigrid);
+        assertEquals(simpleSigrid.getHref(),mappedArtist.getHref());
+        assertEquals(simpleSigrid.getId(),mappedArtist.getId());
+        assertEquals(simpleSigrid.getName(),mappedArtist.getName());
+        assertEquals(simpleSigrid.getType().toString().toLowerCase(), mappedArtist.getType());
+        assertEquals(simpleSigrid.getUri(), mappedArtist.getUri().toString());
+        assertEquals(simpleSigrid.getExternalUrls().get("spotify"), mappedArtist.getExternalURL().toString());
     }
 
     @Test
-    public void mapArtistCorrectly() {
-
-    }
-
-    @Test
-    public void mapUserCorrectly() {
-
-    }
-
-    @Test
-    public void mapPlaylistCorrectly() {
-
+    public void mapArtistCorrectly() throws MalformedURLException {
+        finalyearproject.model.Artist mappedArtist = DownstreamMapper.mapArtist(fullSigrid);
+        assertEquals(fullSigrid.getExternalUrls().get("spotify"), mappedArtist.getExternalURL().toString());
+        assertEquals(fullSigrid.getGenres(), mappedArtist.getGenres());
+        assertEquals(fullSigrid.getHref(), mappedArtist.getHref());
+        assertEquals(fullSigrid.getId(), mappedArtist.getId());
+        assertEquals(fullSigrid.getName(), mappedArtist.getName());
+        assertEquals(fullSigrid.getType().toString().toLowerCase(), mappedArtist.getType());
+        assertEquals(fullSigrid.getUri(), mappedArtist.getUri().toString());
+        assertEquals(fullSigrid.getFollowers().getTotal(), mappedArtist.getFollowers());
+        assertEquals(fullSigrid.getPopularity(), mappedArtist.getPopularity());
     }
 }

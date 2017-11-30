@@ -26,5 +26,7 @@ public class Artist {
     String href;
     String name;
     String type;
+    int followers;
+    int popularity;
     URI uri;
 }

@@ -44,4 +44,11 @@ public class PlaylistController {
         return existingPlaylist;
     }
 
+    @RequestMapping(value = "playlists/request", method = RequestMethod.POST)
+    public Playlist create(@RequestBody String playlistName) {
+        Playlist playlist = new Playlist();
+        playlist.setName(playlistName);
+        return playlistRepository.saveAndFlush(playlist);
+    }
+
 }

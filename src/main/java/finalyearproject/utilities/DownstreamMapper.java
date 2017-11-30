@@ -57,11 +57,13 @@ public class DownstreamMapper {
                 .name(fullArtist.getName())
                 .type(fullArtist.getType().getType())
                 .uri(URI.create(fullArtist.getUri()))
+                .followers(fullArtist.getFollowers().getTotal())
+                .popularity(fullArtist.getPopularity())
                 .build();
     }
 
     public static User mapUser(com.wrapper.spotify.models.User fullUser) {
-        List<String> imageUrls = null;
+        List<String> imageUrls = new ArrayList<String>();
         for (int i = 0; i < fullUser.getImages().size(); i++) {
             imageUrls.add(fullUser.getImages().get(i).getUrl());
         }
@@ -76,7 +78,7 @@ public class DownstreamMapper {
     }
 
     public static Playlist mapPlaylist(com.wrapper.spotify.models.Playlist fullPlaylist) throws MalformedURLException {
-        List<String> imageUrls = null;
+        List<String> imageUrls = new ArrayList<String>();
         for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
             imageUrls.add(fullPlaylist.getImages().get(i).getUrl());
         }

@@ -7,6 +7,7 @@ import com.wrapper.spotify.Api;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.ClientCredentials;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +24,12 @@ import org.springframework.stereotype.Service;
 
 @Configuration
 @Component
+@NoArgsConstructor
 @Data
 public class AuthenticationService {
-
+    @Value("${clientId}")
     private String clientId;
+    @Value("${clientSecret}")
     private String clientSecret;
 
     private final static Logger logger = Logger.getLogger(AuthenticationService.class);
