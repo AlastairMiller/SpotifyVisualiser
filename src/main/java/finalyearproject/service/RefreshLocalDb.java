@@ -22,10 +22,11 @@ public class RefreshLocalDb {
 
     final static Logger logger = Logger.getLogger(RefreshLocalDb.class);
 
-    Api api = Api.DEFAULT_API;
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 1000)
     public void main() throws InterruptedException {
+        AuthenticationService authenticationService = new AuthenticationService();
+        Api api = authenticationService.clientCredentialflow();
         Thread refresh = new Thread(RefreshRunnable);
         refresh.start();
         refresh.join();
@@ -36,17 +37,17 @@ public class RefreshLocalDb {
         public void run() {
             logger.info("Database refresh started");
             List<Playlist> playlistsToPull = playlistRepository.findByName(null);
-            if (playlistsToPull != null) {
-                AuthenticationService authenticationService = new AuthenticationService();
-
+            if (playlistsToPull.size() > 0) {
                 pullPlaylists(playlistsToPull);
+            } else {
+                logger.info("No updates needed to local DB");
             }
-        }
 
+        }
     };
 
     List<com.wrapper.spotify.models.Playlist> pullPlaylists(List<Playlist> playlistsToPull) {
-        for(int i=0; i < playlistsToPull.size(); i++){
+        for (int i = 0; i < playlistsToPull.size(); i++) {
 
         }
 
