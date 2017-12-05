@@ -1,11 +1,15 @@
 package finalyearproject.utilities;
 
 import com.wrapper.spotify.Api;
+import com.wrapper.spotify.models.FeaturedPlaylists;
+import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 import finalyearproject.model.Artist;
 import finalyearproject.model.Playlist;
 import finalyearproject.model.Song;
 import finalyearproject.model.User;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -98,5 +102,27 @@ public class DownstreamMapper {
                 .tracks(formattedSongs)
                 .build();
     }
+
+    public static Playlist mapSimplePlaylist(SimplePlaylist fullPlaylist) throws MalformedURLException {
+        List<String> imageUrls = new ArrayList<String>();
+        for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
+            imageUrls.add(fullPlaylist.getImages().get(i).getUrl());
+        }
+        List<Song> formattedSongs = new ArrayList<Song>();
+
+        
+        return Playlist.builder()
+                .id(fullPlaylist.getId())
+                .uri(URI.create(fullPlaylist.getUri()))
+                .externalURL(new URL(fullPlaylist.getExternalUrls().get("0")))
+                .href(fullPlaylist.getHref())
+                .images(imageUrls)
+                .name(fullPlaylist.getName())
+                .owner(mapUser(fullPlaylist.getOwner()))
+                .tracks(formattedSongs)
+                .build();
+    }
+
+
 
 }

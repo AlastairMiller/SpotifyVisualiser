@@ -47,10 +47,11 @@ public class PlaylistController {
     }
 
     @RequestMapping(value = "playlists/request", method = RequestMethod.POST)
-    public Playlist create(@RequestBody String playlistName) {
+    public Playlist create(@RequestBody String playlistId, @RequestBody String playlistOwner) {
         Playlist playlist = new Playlist();
-        playlist.setName(playlistName);
-        log.info("Playlist called: " + playlistName + " will be downloaded in the next refresh");
+        playlist.setId(playlistId);
+        playlist.setName(playlistOwner);
+        log.info("Playlist Id: " + playlistId + " will be downloaded in the next refresh");
         return playlistRepository.saveAndFlush(playlist);
     }
 
