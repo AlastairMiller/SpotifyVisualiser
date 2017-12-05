@@ -3,7 +3,7 @@
 .idea/
 /finalyearproject.iml
 /target/
-/src/main/resources/logs/
-/src/main/resources/application-test.properties
-/src/main/resources/application.properties
-/src/main/resources/application-prod.properties
+logs
+application-test.properties
+application.properties
+application-prod.properties
