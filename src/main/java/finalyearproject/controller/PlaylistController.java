@@ -2,6 +2,7 @@ package finalyearproject.controller;
 
 import finalyearproject.model.Playlist;
 import finalyearproject.repository.PlaylistRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping("api/v1/")
 public class PlaylistController {
 
@@ -48,6 +50,7 @@ public class PlaylistController {
     public Playlist create(@RequestBody String playlistName) {
         Playlist playlist = new Playlist();
         playlist.setName(playlistName);
+        log.info("Playlist called: " + playlistName + " will be downloaded in the next refresh");
         return playlistRepository.saveAndFlush(playlist);
     }
 

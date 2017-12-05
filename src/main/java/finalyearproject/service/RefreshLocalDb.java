@@ -35,13 +35,13 @@ public class RefreshLocalDb {
         logger.info("Database refresh started");
         List<Playlist> playlistsToPull = playlistRepository.findByName(null);
         if (playlistsToPull.size() > 0) {
-            pullPlaylists(playlistsToPull);
+            pullPlaylists(playlistsToPull, api);
         } else {
             logger.info("No updates needed to local DB");
         }
     }
 
-    List<com.wrapper.spotify.models.Playlist> pullPlaylists(List<Playlist> playlistsToPull) {
+    List<com.wrapper.spotify.models.Playlist> pullPlaylists(List<Playlist> playlistsToPull, Api api) {
         for (int i = 0; i < playlistsToPull.size(); i++) {
 
         }
