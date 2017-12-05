@@ -6,33 +6,21 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.ClientCredentials;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.log4j.Logger;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-
-
-@Configuration
+@Slf4j
 @Component
-@NoArgsConstructor
-@Data
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-    @Value("${clientId}")
-    private String clientId;
-    @Value("${clientSecret}")
-    private String clientSecret;
-
-    private final static Logger logger = Logger.getLogger(AuthenticationService.class);
+    String clientId;
+    String clientSecret;
 
     public AuthenticationService(@Value("${clientId}") String clientId, @Value("${clientSecret}") String clientSecret) {
         this.clientId = clientId;
@@ -41,9 +29,11 @@ public class AuthenticationService {
 
     public Api clientCredentialflow() {
         final Api api = Api.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
+                .clientId(this.clientId)
+                .clientSecret(this.clientSecret)
                 .build();
+
+        log.info("ClientId {} clientSecret {}", clientId, clientSecret);
 
         final ClientCredentialsGrantRequest request = api.clientCredentialsGrant().build();
 
@@ -53,28 +43,17 @@ public class AuthenticationService {
             @Override
             public void onSuccess(ClientCredentials clientCredentials) {
 
-                logger.info("Successfully retrieved an access token: " + clientCredentials.getAccessToken());
-                logger.info("The access token expires in " + clientCredentials.getExpiresIn() + " seconds");
+                log.info("Successfully retrieved an access token: " + clientCredentials.getAccessToken());
+                log.info("The access token expires in " + clientCredentials.getExpiresIn() + " seconds");
 
                 api.setAccessToken(clientCredentials.getAccessToken());
 
-
             }
-
             @Override
             public void onFailure(Throwable throwable) {
-                logger.error("Could not retrieve an access token");
+                log.error("Could not retrieve an access token");
             }
         });
         return api;
-    }
-
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
-        PropertySourcesPlaceholderConfigurer c = new PropertySourcesPlaceholderConfigurer();
-        c.setIgnoreUnresolvablePlaceholders(true);
-        c.setLocation(new ClassPathResource("application.properties"));
-        return c;
     }
 }
