@@ -32,8 +32,6 @@ public class AuthenticationService {
                 .clientSecret(this.clientSecret)
                 .build();
 
-        log.info("ClientId {} clientSecret {}", clientId, clientSecret);
-
         final ClientCredentialsGrantRequest request = api.clientCredentialsGrant().build();
 
         final SettableFuture<ClientCredentials> responseFuture = request.getAsync();

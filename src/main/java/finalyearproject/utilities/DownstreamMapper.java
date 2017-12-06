@@ -1,15 +1,10 @@
 package finalyearproject.utilities;
 
-import com.wrapper.spotify.Api;
-import com.wrapper.spotify.models.FeaturedPlaylists;
-import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 import finalyearproject.model.Artist;
 import finalyearproject.model.Playlist;
 import finalyearproject.model.Song;
 import finalyearproject.model.User;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -19,57 +14,98 @@ import java.util.List;
 
 public class DownstreamMapper {
 
-    public static Song mapSong(Track fullTrack) throws MalformedURLException {
+    public static Song mapSong(Track fullTrack) {
         List<Artist> minimisedArtists = new ArrayList<Artist>();
         for (int i = 0; i < fullTrack.getArtists().size(); i++) {
             minimisedArtists.add(mapSimpleArtist(fullTrack.getArtists().get(i)));
         }
-        return Song.builder()
-                .id(fullTrack.getId())
-                .artists(minimisedArtists)
-                .availableMarkets(fullTrack.getAvailableMarkets())
-                .discNum(fullTrack.getDiscNumber())
-                .durationMs(fullTrack.getDuration())
-                .explicit(fullTrack.isExplicit())
-                .externalURL((new URL(fullTrack.getExternalUrls().get("spotify"))))
-                .href(fullTrack.getHref())
-                .name(fullTrack.getName())
-                .previewURL(new URL(fullTrack.getPreviewUrl()))
-                .trackNumber(fullTrack.getTrackNumber())
-                .popularity(fullTrack.getPopularity())
-                .uri(URI.create(fullTrack.getUri()))
-                .build();
+        try {
+            return Song.builder()
+                    .id(fullTrack.getId())
+                    .artists(minimisedArtists)
+                    .availableMarkets(fullTrack.getAvailableMarkets())
+                    .discNum(fullTrack.getDiscNumber())
+                    .durationMs(fullTrack.getDuration())
+                    .explicit(fullTrack.isExplicit())
+                    .externalURL((new URL(fullTrack.getExternalUrls().get("spotify"))))
+                    .href(fullTrack.getHref())
+                    .name(fullTrack.getName())
+                    .previewURL(new URL(fullTrack.getPreviewUrl()))
+                    .trackNumber(fullTrack.getTrackNumber())
+                    .popularity(fullTrack.getPopularity())
+                    .uri(URI.create(fullTrack.getUri()))
+                    .build();
+        } catch (MalformedURLException e) {
+            return Song.builder()
+                    .id(fullTrack.getId())
+                    .artists(minimisedArtists)
+                    .availableMarkets(fullTrack.getAvailableMarkets())
+                    .discNum(fullTrack.getDiscNumber())
+                    .durationMs(fullTrack.getDuration())
+                    .explicit(fullTrack.isExplicit())
+                    .href(fullTrack.getHref())
+                    .name(fullTrack.getName())
+                    .trackNumber(fullTrack.getTrackNumber())
+                    .popularity(fullTrack.getPopularity())
+                    .uri(URI.create(fullTrack.getUri()))
+                    .build();
+        }
     }
 
-    public static Artist mapSimpleArtist(com.wrapper.spotify.models.SimpleArtist fullArtist) throws MalformedURLException {
-        return Artist.builder()
-                .id(fullArtist.getId())
-                .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
-                .href(fullArtist.getHref())
-                .name(fullArtist.getName())
-                .type(fullArtist.getType().getType())
-                .uri(URI.create(fullArtist.getUri()))
-                .build();
+    public static Artist mapSimpleArtist(com.wrapper.spotify.models.SimpleArtist fullArtist) {
+        try {
+            return Artist.builder()
+                    .id(fullArtist.getId())
+                    .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
+                    .href(fullArtist.getHref())
+                    .name(fullArtist.getName())
+                    .type(fullArtist.getType().getType())
+                    .uri(URI.create(fullArtist.getUri()))
+                    .build();
+        } catch (MalformedURLException e) {
+            return Artist.builder()
+                    .id(fullArtist.getId())
+                    .href(fullArtist.getHref())
+                    .name(fullArtist.getName())
+                    .type(fullArtist.getType().getType())
+                    .uri(URI.create(fullArtist.getUri()))
+                    .build();
+        }
     }
 
-    public static Artist mapArtist(com.wrapper.spotify.models.Artist fullArtist) throws MalformedURLException {
-        return Artist.builder()
-                .id(fullArtist.getId())
-                .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
-                .genres(fullArtist.getGenres())
-                .href(fullArtist.getHref())
-                .name(fullArtist.getName())
-                .type(fullArtist.getType().getType())
-                .uri(URI.create(fullArtist.getUri()))
-                .followers(fullArtist.getFollowers().getTotal())
-                .popularity(fullArtist.getPopularity())
-                .build();
+    public static Artist mapArtist(com.wrapper.spotify.models.Artist fullArtist) {
+        try {
+            return Artist.builder()
+                    .id(fullArtist.getId())
+                    .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
+                    .genres(fullArtist.getGenres())
+                    .href(fullArtist.getHref())
+                    .name(fullArtist.getName())
+                    .type(fullArtist.getType().getType())
+                    .uri(URI.create(fullArtist.getUri()))
+                    .followers(fullArtist.getFollowers().getTotal())
+                    .popularity(fullArtist.getPopularity())
+                    .build();
+        } catch (MalformedURLException e) {
+            return Artist.builder()
+                    .id(fullArtist.getId())
+                    .genres(fullArtist.getGenres())
+                    .href(fullArtist.getHref())
+                    .name(fullArtist.getName())
+                    .type(fullArtist.getType().getType())
+                    .uri(URI.create(fullArtist.getUri()))
+                    .followers(fullArtist.getFollowers().getTotal())
+                    .popularity(fullArtist.getPopularity())
+                    .build();
+        }
     }
 
     public static User mapUser(com.wrapper.spotify.models.User fullUser) {
         List<String> imageUrls = new ArrayList<String>();
-        for (int i = 0; i < fullUser.getImages().size(); i++) {
-            imageUrls.add(fullUser.getImages().get(i).getUrl());
+        if( fullUser.getImages()!=null) {
+            for (int i = 0; i < fullUser.getImages().size(); i++) {
+                imageUrls.add(fullUser.getImages().get(i).getUrl());
+            }
         }
         return User.builder()
                 .id(fullUser.getId())
@@ -81,48 +117,43 @@ public class DownstreamMapper {
                 .build();
     }
 
-    public static Playlist mapPlaylist(com.wrapper.spotify.models.Playlist fullPlaylist) throws MalformedURLException {
+    public static Playlist mapPlaylist(com.wrapper.spotify.models.Playlist fullPlaylist){
         List<String> imageUrls = new ArrayList<String>();
-        for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
-            imageUrls.add(fullPlaylist.getImages().get(i).getUrl());
+        if(fullPlaylist.getImages()!=null) {
+            for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
+                imageUrls.add(fullPlaylist.getImages().get(i).getUrl());
+            }
         }
         List<Song> formattedSongs = new ArrayList<Song>();
         for (int n = 0; n < fullPlaylist.getTracks().getTotal(); n++) {
             formattedSongs.add(mapSong(fullPlaylist.getTracks().getItems().get(n).getTrack()));
         }
-        return Playlist.builder()
-                .id(fullPlaylist.getId())
-                .uri(URI.create(fullPlaylist.getUri()))
-                .externalURL(new URL(fullPlaylist.getExternalUrls().get("0")))
-                .numOfFollowers(fullPlaylist.getFollowers().getTotal())
-                .href(fullPlaylist.getHref())
-                .images(imageUrls)
-                .name(fullPlaylist.getName())
-                .owner(mapUser(fullPlaylist.getOwner()))
-                .tracks(formattedSongs)
-                .build();
-    }
-
-    public static Playlist mapSimplePlaylist(SimplePlaylist fullPlaylist) throws MalformedURLException {
-        List<String> imageUrls = new ArrayList<String>();
-        for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
-            imageUrls.add(fullPlaylist.getImages().get(i).getUrl());
+        try {
+            return Playlist.builder()
+                    .id(fullPlaylist.getId())
+                    .uri(URI.create(fullPlaylist.getUri()))
+                    .externalURL(new URL(fullPlaylist.getExternalUrls().get("spotify")))
+                    .numOfFollowers(fullPlaylist.getFollowers().getTotal())
+                    .href(fullPlaylist.getHref())
+                    .images(imageUrls)
+                    .name(fullPlaylist.getName())
+                    .owner(mapUser(fullPlaylist.getOwner()))
+                    .tracks(formattedSongs)
+                    .build();
+        } catch (MalformedURLException e) {
+            return Playlist.builder()
+                    .id(fullPlaylist.getId())
+                    .uri(URI.create(fullPlaylist.getUri()))
+                    .numOfFollowers(fullPlaylist.getFollowers().getTotal())
+                    .href(fullPlaylist.getHref())
+                    .images(imageUrls)
+                    .name(fullPlaylist.getName())
+                    .owner(mapUser(fullPlaylist.getOwner()))
+                    .tracks(formattedSongs)
+                    .build();
         }
-        List<Song> formattedSongs = new ArrayList<Song>();
 
-        
-        return Playlist.builder()
-                .id(fullPlaylist.getId())
-                .uri(URI.create(fullPlaylist.getUri()))
-                .externalURL(new URL(fullPlaylist.getExternalUrls().get("0")))
-                .href(fullPlaylist.getHref())
-                .images(imageUrls)
-                .name(fullPlaylist.getName())
-                .owner(mapUser(fullPlaylist.getOwner()))
-                .tracks(formattedSongs)
-                .build();
     }
-
 
 
 }

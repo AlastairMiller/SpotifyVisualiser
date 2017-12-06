@@ -3,10 +3,14 @@ package finalyearproject.service;
 
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.methods.FeaturedPlaylistsRequest;
+import com.wrapper.spotify.methods.PlaylistRequest;
+import com.wrapper.spotify.methods.UserRequest;
 import com.wrapper.spotify.models.FeaturedPlaylists;
 import com.wrapper.spotify.models.SimplePlaylist;
+import com.wrapper.spotify.models.User;
 import finalyearproject.model.Playlist;
 import finalyearproject.repository.PlaylistRepository;
+import finalyearproject.repository.UserRepository;
 import finalyearproject.utilities.DownstreamMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -25,11 +29,13 @@ public class RefreshLocalDb {
 
     PlaylistRepository playlistRepository;
     AuthenticationService authenticationService;
+    UserRepository userRepository;
 
     @Autowired
-    public RefreshLocalDb(AuthenticationService authenticationServicem, PlaylistRepository playlistRepository) {
+    public RefreshLocalDb(AuthenticationService authenticationServicem, PlaylistRepository playlistRepository, UserRepository userRepository) {
         this.authenticationService = authenticationServicem;
         this.playlistRepository = playlistRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -60,14 +66,45 @@ public class RefreshLocalDb {
         try {
             featuredPlaylists = request.get();
             List<SimplePlaylist> featuredPlaylistList = featuredPlaylists.getPlaylists().getItems();
-            for (int i = 0; i <featuredPlaylistList.size(); i++){
-                Playlist newPlaylist = DownstreamMapper.mapPlaylist(featuredPlaylistList.get(i));
+            for (SimplePlaylist simplePlaylist : featuredPlaylistList) {
+                com.wrapper.spotify.models.Playlist fullPlaylist = convertSimplePlayliststoPlaylists(api, simplePlaylist);
+                if (fullPlaylist != null) {
+log.info("Sucessfully pulled {}", fullPlaylist.getName());
+                    Playlist newPlaylist = DownstreamMapper.mapPlaylist(fullPlaylist);
+                    if (userRepository.findById(fullPlaylist.getOwner().getId()) == null) {
+                        finalyearproject.model.User newUser = DownstreamMapper.mapUser(pullUser(api, fullPlaylist.getOwner().getId()));
+                        userRepository.saveAndFlush(newUser);
+                    }
+                    playlistRepository.saveAndFlush(newPlaylist);
+                    log.info("Saved a playlist called {}", newPlaylist);
+                }
             }
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api");
             e.printStackTrace();
-
         }
+    }
+
+
+    private User pullUser(Api api, String id) {
+        final UserRequest request = api.getUser(id).build();
+        try {
+            return request.get();
+        } catch (Exception e) {
+            log.error("Cannot download user {}", id);
+            return null;
+        }
+    }
+
+    private com.wrapper.spotify.models.Playlist convertSimplePlayliststoPlaylists(Api api, SimplePlaylist simplePlaylist) {
+        final PlaylistRequest request = api.getPlaylist(simplePlaylist.getOwner().getId(), simplePlaylist.getId())
+                .build();
+        try {
+            final com.wrapper.spotify.models.Playlist playlist = request.get();
+        } catch (Exception e) {
+            log.error("Failed to convert simple Playlist {} ", simplePlaylist.getName());
+        }
+        return null;
     }
 
     List<com.wrapper.spotify.models.Playlist> pullPlaylists(List<Playlist> playlistsToPull, Api api) {
