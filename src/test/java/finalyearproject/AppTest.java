@@ -4,17 +4,17 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
-import com.wrapper.spotify.exceptions.WebApiException;
+import com.wrapper.spotify.methods.AlbumRequest;
+import com.wrapper.spotify.methods.ArtistRequest;
+import com.wrapper.spotify.methods.PlaylistRequest;
 import com.wrapper.spotify.methods.TrackRequest;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
-import com.wrapper.spotify.models.ClientCredentials;
-import com.wrapper.spotify.models.Track;
+import com.wrapper.spotify.models.*;
 import finalyearproject.controller.HomeController;
 import finalyearproject.service.AuthenticationService;
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,8 +25,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -34,15 +32,16 @@ import static org.junit.Assert.fail;
 @ContextConfiguration
 @SpringBootTest
 @ComponentScan
+@Slf4j
 public class AppTest {
 
-    private final static Logger logger = Logger.getLogger(AppTest.class);
     @Value("${clientId}")
     String clientID;
     @Value("${clientSecret}")
     String clientSecret;
     @Value("${redirectURI}")
     String redirectURI;
+
 
     @Test
     public void testApp() {
@@ -66,7 +65,7 @@ public class AppTest {
         Futures.addCallback(responseFuture, new FutureCallback<ClientCredentials>() {
             @Override
             public void onSuccess(ClientCredentials clientCredentials) {
-                logger.info("Successfully retrieved an access token! " + clientCredentials.getAccessToken());
+                log.info("Successfully retrieved an access token! " + clientCredentials.getAccessToken());
             }
 
             @Override
@@ -77,6 +76,9 @@ public class AppTest {
 
     }
 
+    //Tests to check health of important API endpoints, Should be run especially when 404 errors are returned in the logs.
+    // Example: https://github.com/spotify/web-api/issues/733
+
     @Test
     public void retrieveSongFromApi() {
         AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
@@ -85,14 +87,59 @@ public class AppTest {
 
         try {
             Track track = request.get();
-            assertEquals("Verifying Song Name: ", track.getName(), "Strangers");
-            assertEquals("Verifying Artist: ", track.getArtists().get(0).getName(), "Sigrid");
-        } catch (WebApiException e) {
+            assertEquals("Verifying Song Name: ", "Strangers", track.getName());
+            assertEquals("Verifying Artist: ", "Sigrid", track.getArtists().get(0).getName());
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
-        } catch (IOException e) {
+        }
+    }
+
+    @Test
+    public void retrievePlaylistFromApi() {
+        AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
+        Api api = authenticationService.clientCredentialflow();
+        final PlaylistRequest request = api.getPlaylist("spotifycharts", "37i9dQZEVXbMDoHDwVN2tF").build();
+        try {
+            final Playlist playlist = request.get();
+            assertEquals("Verifying Playlist Name: ", "Global Top 50", playlist.getName());
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
+        }
+    }
+
+    @Test
+    public void retrieveAlbumFromApi() {
+        AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
+        Api api = authenticationService.clientCredentialflow();
+        final AlbumRequest request = api.getAlbum("0HEKWtu7St3tKgZDKZsX90").build();
+
+        try {
+            final Album album = request.get();
+            assertEquals("Verifying Album Name: ", "Youthquake", album.getName());
+            assertEquals("Verifying Artist Name: ", "Dead Or Alive", album.getArtists().get(0).getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+
+    }
+
+    @Test
+    public void retrieveArtistFromApi() {
+        AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
+        Api api = authenticationService.clientCredentialflow();
+
+        final ArtistRequest request = api.getArtist("6hN9F0iuULZYWXppob22Aj").build();
+
+        try {
+            final Artist artist = request.get();
+            assertEquals("Verifying Artist Name: ", "Simple Minds", artist.getName());
+            assertEquals("Verifying Artist Genre:", "art rock", artist.getGenres().get(0));
+
+        } catch (Exception e) {
+            System.out.println("Something went wrong!" + e.getMessage());
         }
     }
 
