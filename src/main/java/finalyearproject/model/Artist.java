@@ -3,6 +3,7 @@ package finalyearproject.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder
 public class Artist {
