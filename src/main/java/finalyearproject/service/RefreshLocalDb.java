@@ -48,7 +48,7 @@ public class RefreshLocalDb {
     @Scheduled(fixedDelay = 10000)
     public void main() {
         Api api = authenticationService.clientCredentialflow();
-        log.info("Database refresh started");
+        log.info("------------------Database refresh started-----------------------");
         List<Playlist> playlistsToPull = playlistRepository.findByName(null);
         pullScheduledPlaylists(api);
         if (playlistsToPull.size() > 0) {
@@ -88,7 +88,8 @@ public class RefreshLocalDb {
 
                     }
                     ArrayList<String> songIdArrayList = new ArrayList<String>();
-                    for (int i = 0; i < fullPlaylist.getTracks().getTotal(); i++) {
+                    ArrayList<String> artistIdArrayList = new ArrayList<String>();
+                    for (int i = 0; i < fullPlaylist.getTracks().getItems().size(); i++) {
                         if (songRepository.findById(fullPlaylist.getTracks().getItems().get(i).getTrack().getId()) == null) {
                             songIdArrayList.add(fullPlaylist.getTracks().getItems().get(i).getTrack().getId());
 
@@ -101,14 +102,16 @@ public class RefreshLocalDb {
                                 if (track != null) {
                                     for (int p = 0; p < track.getArtists().size(); p++) {
                                         if (artistRepository.findById(track.getArtists().get(p).getId()) == null) {
-                                            com.wrapper.spotify.models.Artist newArtist = pullArtist(api, track.getArtists().get(p).getId());
-                                            if (newArtist != null) {
-                                                artistRepository.saveAndFlush(DownstreamMapper.mapArtist(newArtist));
-                                                log.info("Saved Artist: {}", newArtist.getName());
-                                            }
+                                            artistIdArrayList.add(track.getArtists().get(p).getId());
+//                                            com.wrapper.spotify.models.Artist newArtist = pullArtist(api, track.getArtists().get(p).getId());
+//                                            if (newArtist != null) {
+//                                                artistRepository.saveAndFlush(DownstreamMapper.mapArtist(newArtist));
+//                                                log.info("Saved Artist: {}", newArtist.getName());
+//                                            }
 
                                         }
                                     }
+
                                     songRepository.saveAndFlush(DownstreamMapper.mapSong(track));
                                     log.info("Saved Song: {} to the database", track.getName());
                                 }
@@ -121,7 +124,7 @@ public class RefreshLocalDb {
                 }
             }
         } catch (Exception e) {
-            log.error("Failed to pull featured Playlists from Spotify Api");
+            log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -131,7 +134,7 @@ public class RefreshLocalDb {
         try {
             return request.get();
         } catch (Exception e) {
-            log.error("Cannot download user metadata with id {}", id);
+            log.error("Cannot download user metadata with id {}, HTTP Status code: {}", id, e.getMessage());
             return null;
         }
     }
@@ -141,19 +144,34 @@ public class RefreshLocalDb {
         try {
             return request.get();
         } catch (Exception e) {
-            log.error("Cannot download metadata for song with id {}", id);
+            log.error("Cannot download metadata for song with id {}, HTTP Status code: {}", id, e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
 
     public static List<Track> pullSongs(Api api, ArrayList<String> ids) {
-        final TracksRequest request = api.getTracks(ids).build();
-        try {
-            return request.get();
-        } catch (Exception e) {
-            log.error("Cannot retrieve batch of songs from api");
-            return null;
+        List<Track> pulledTracks = new ArrayList<Track>();
+        if (ids.size() > 50) {
+            final TracksRequest request = api.getTracks(ids.subList(0, 49)).build();
+            ids = new ArrayList<String>(ids.subList(49, ids.size()));
+            try {
+                pulledTracks.addAll(request.get());
+            } catch (Exception e) {
+                log.error("Cannot retrieve batch of songs from api, HTTP Status code: {}", e.getMessage());
+                return null;
+            }
+            pulledTracks.addAll(pullSongs(api, ids));
+            return pulledTracks;
+        } else {
+            final TracksRequest request = api.getTracks(ids).build();
+            try {
+                pulledTracks.addAll(request.get());
+                return pulledTracks;
+            } catch (Exception e) {
+                log.error("Cannot retrieve batch of songs from api, HTTP Status code: {}", e.getMessage());
+                return null;
+            }
         }
     }
 
@@ -162,11 +180,13 @@ public class RefreshLocalDb {
         try {
             return request.get();
         } catch (Exception e) {
-            log.error("Failed to download metadata for artist {} ", id);
+            log.error("Failed to download metadata for artist {}, HTTP Status code: {} ", id, e.getMessage());
             return null;
         }
 
     }
+
+//    public static List<>
 
     private com.wrapper.spotify.models.Playlist convertSimplePlayliststoPlaylists(Api api, SimplePlaylist simplePlaylist) {
         return pullPlaylist(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
@@ -182,7 +202,7 @@ public class RefreshLocalDb {
         try {
             return request.get();
         } catch (Exception e) {
-            log.error("Failed to download metadata for playlist {} ", playlistId);
+            log.error("Failed to download metadata for playlist {}, HTTP Status code: {}", playlistId, e.getMessage());
         }
         return null;
     }

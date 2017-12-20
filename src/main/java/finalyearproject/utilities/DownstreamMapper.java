@@ -125,7 +125,7 @@ public class DownstreamMapper {
             }
         }
         List<Song> formattedSongs = new ArrayList<Song>();
-        for (int n = 0; n < fullPlaylist.getTracks().getTotal(); n++) {
+        for (int n = 0; n < fullPlaylist.getTracks().getItems().size(); n++) {
             formattedSongs.add(mapSong(fullPlaylist.getTracks().getItems().get(n).getTrack()));
         }
         try {
