@@ -88,7 +88,6 @@ public class RefreshLocalDb {
 
                     }
                     ArrayList<String> songIdArrayList = new ArrayList<String>();
-                    ArrayList<String> artistIdArrayList = new ArrayList<String>();
                     for (int i = 0; i < fullPlaylist.getTracks().getItems().size(); i++) {
                         if (songRepository.findById(fullPlaylist.getTracks().getItems().get(i).getTrack().getId()) == null) {
                             songIdArrayList.add(fullPlaylist.getTracks().getItems().get(i).getTrack().getId());
@@ -96,19 +95,21 @@ public class RefreshLocalDb {
                         }
                     }
                     if (songIdArrayList.size() > 0) {
-                        List<Track> TrackArrayList = pullSongs(api, songIdArrayList);
-                        if (TrackArrayList != null) {
-                            for (Track track : TrackArrayList) {
+                        List<Track> trackArrayList = pullSongs(api, songIdArrayList);
+                        if (trackArrayList != null) {
+                            for (Track track : trackArrayList) {
+                                ArrayList<String> artistIdArrayList = new ArrayList<String>();
                                 if (track != null) {
                                     for (int p = 0; p < track.getArtists().size(); p++) {
                                         if (artistRepository.findById(track.getArtists().get(p).getId()) == null) {
                                             artistIdArrayList.add(track.getArtists().get(p).getId());
-//                                            com.wrapper.spotify.models.Artist newArtist = pullArtist(api, track.getArtists().get(p).getId());
-//                                            if (newArtist != null) {
-//                                                artistRepository.saveAndFlush(DownstreamMapper.mapArtist(newArtist));
-//                                                log.info("Saved Artist: {}", newArtist.getName());
-//                                            }
-
+                                        }
+                                    }
+                                    List<com.wrapper.spotify.models.Artist> artistList = pullArtists(api, artistIdArrayList);
+                                    if (artistList != null) {
+                                        for (com.wrapper.spotify.models.Artist artist : artistList) {
+                                            artistRepository.saveAndFlush(DownstreamMapper.mapArtist(artist));
+                                            log.info("Saved Artist: {} to the database", artist.getName());
                                         }
                                     }
 
@@ -118,6 +119,7 @@ public class RefreshLocalDb {
                             }
                         }
                     }
+
 
                     playlistRepository.saveAndFlush(newPlaylist);
                     log.info("Saved a playlist called {}", newPlaylist.getName());
@@ -169,7 +171,7 @@ public class RefreshLocalDb {
                 pulledTracks.addAll(request.get());
                 return pulledTracks;
             } catch (Exception e) {
-                log.error("Cannot retrieve batch of songs from api, HTTP Status code: {}", e.getMessage());
+                log.error("Cannot retrieve batch of songs from api, HTTP error code: {}", e.getMessage());
                 return null;
             }
         }
@@ -180,13 +182,35 @@ public class RefreshLocalDb {
         try {
             return request.get();
         } catch (Exception e) {
-            log.error("Failed to download metadata for artist {}, HTTP Status code: {} ", id, e.getMessage());
+            log.error("Failed to download metadata for artist {}, HTTP error code: {} ", id, e.getMessage());
             return null;
         }
 
     }
 
-//    public static List<>
+    public static List<com.wrapper.spotify.models.Artist> pullArtists(Api api, List<String> ids) {
+        List<com.wrapper.spotify.models.Artist> pulledArtists = new ArrayList<com.wrapper.spotify.models.Artist>();
+        if (ids.size() > 50) {
+            final ArtistsRequest request = api.getArtists(ids.subList(0, 49)).build();
+            ids = new ArrayList<String>(ids.subList(49, ids.size()));
+            try {
+                pulledArtists.addAll(request.get());
+            } catch (Exception e) {
+                log.error("Cannot retrieve batch of Artists. HTTP error code: {}", e.getMessage());
+            }
+            pulledArtists.addAll(pullArtists(api, ids));
+            return pulledArtists;
+        } else {
+            final ArtistsRequest request = api.getArtists(ids).build();
+            try {
+                pulledArtists.addAll(request.get());
+                return pulledArtists;
+            } catch (Exception e) {
+                log.error("Cannot retrieve batch of Artists. HTTP error code: {}", e.getMessage());
+                return null;
+            }
+        }
+    }
 
     private com.wrapper.spotify.models.Playlist convertSimplePlayliststoPlaylists(Api api, SimplePlaylist simplePlaylist) {
         return pullPlaylist(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
@@ -202,7 +226,7 @@ public class RefreshLocalDb {
         try {
             return request.get();
         } catch (Exception e) {
-            log.error("Failed to download metadata for playlist {}, HTTP Status code: {}", playlistId, e.getMessage());
+            log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
         }
         return null;
     }
