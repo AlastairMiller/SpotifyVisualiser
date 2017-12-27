@@ -48,9 +48,10 @@ public class RefreshLocalDb {
     @Scheduled(fixedDelay = 10000)
     public void main() {
         Api api = authenticationService.clientCredentialflow();
-        log.info("------------------Database refresh started-----------------------");
+        log.info("-----------------------Database refresh started-----------------------");
         List<Playlist> playlistsToPull = playlistRepository.findByName(null);
-        pullScheduledPlaylists(api);
+        pullLocationPlaylists(api);
+        pullFeaturedPlaylists(api);
         if (playlistsToPull.size() > 0) {
             for (Playlist aPlaylistToPull : playlistsToPull) {
                 pullPlaylist(api, aPlaylistToPull);
@@ -60,8 +61,18 @@ public class RefreshLocalDb {
         }
     }
 
-    private void pullScheduledPlaylists(Api api) {
-        log.info("Pulling featured Playlists");
+    private void pullLocationPlaylists(Api api) {
+        log.info("-----------------------Pulling Location Playlists-----------------------");
+        List<SimplePlaylist> playlists = pullPlaylistsForAUser(api, "thesoundsofspotify", 0);
+        log.info(String.valueOf(playlists.size()));
+        playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
+        log.info(String.valueOf(playlists.size()));
+
+
+    }
+
+    private void pullFeaturedPlaylists(Api api) {
+        log.info("-----------------------Pulling featured Playlists-----------------------");
         Date timestamp = new Date();
         FeaturedPlaylists featuredPlaylists;
 
@@ -75,7 +86,7 @@ public class RefreshLocalDb {
             featuredPlaylists = request.get();
             List<SimplePlaylist> featuredPlaylistList = featuredPlaylists.getPlaylists().getItems();
             for (SimplePlaylist simplePlaylist : featuredPlaylistList) {
-                com.wrapper.spotify.models.Playlist fullPlaylist = convertSimplePlayliststoPlaylists(api, simplePlaylist);
+                com.wrapper.spotify.models.Playlist fullPlaylist = convertSimplePlaylisttoPlaylist(api, simplePlaylist);
 
                 if (fullPlaylist != null) {
 
@@ -133,6 +144,7 @@ public class RefreshLocalDb {
             e.printStackTrace();
         }
     }
+
 
     private User pullUser(Api api, String id) {
         final UserRequest request = api.getUser(id).build();
@@ -215,8 +227,22 @@ public class RefreshLocalDb {
         }
     }
 
-    private com.wrapper.spotify.models.Playlist convertSimplePlayliststoPlaylists(Api api, SimplePlaylist simplePlaylist) {
+    private com.wrapper.spotify.models.Playlist convertSimplePlaylisttoPlaylist(Api api, SimplePlaylist simplePlaylist) {
         return pullPlaylist(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
+    }
+
+    private List<SimplePlaylist> pullPlaylistsForAUser(Api api, String userId, int offset) {
+        final UserPlaylistsRequest request = api.getPlaylistsForUser(userId).limit(50).offset(offset).build();
+        try {
+            List<SimplePlaylist> usersPlaylist = new ArrayList<SimplePlaylist>(request.get().getItems());
+            if (usersPlaylist.size() == 50) {
+                usersPlaylist.addAll(pullPlaylistsForAUser(api, userId, offset + 50));
+            }
+            return usersPlaylist;
+        } catch (Exception e) {
+            log.error("Failed to grab user's: {} playlist", userId);
+            return null;
+        }
     }
 
 
