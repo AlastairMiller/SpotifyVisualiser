@@ -97,25 +97,28 @@ public class RefreshLocalDb {
                     if (songIdArrayList.size() > 0) {
                         List<Track> trackArrayList = pullSongs(api, songIdArrayList);
                         if (trackArrayList != null) {
+                            ArrayList<String> artistIdArrayList = new ArrayList<String>();
                             for (Track track : trackArrayList) {
-                                ArrayList<String> artistIdArrayList = new ArrayList<String>();
                                 if (track != null) {
                                     for (int p = 0; p < track.getArtists().size(); p++) {
                                         if (artistRepository.findById(track.getArtists().get(p).getId()) == null) {
                                             artistIdArrayList.add(track.getArtists().get(p).getId());
                                         }
                                     }
-                                    List<com.wrapper.spotify.models.Artist> artistList = pullArtists(api, artistIdArrayList);
-                                    if (artistList != null) {
-                                        for (com.wrapper.spotify.models.Artist artist : artistList) {
-                                            artistRepository.saveAndFlush(DownstreamMapper.mapArtist(artist));
-                                            log.info("Saved Artist: {} to the database", artist.getName());
-                                        }
-                                    }
-
-                                    songRepository.saveAndFlush(DownstreamMapper.mapSong(track));
-                                    log.info("Saved Song: {} to the database", track.getName());
                                 }
+                            }
+
+                            List<com.wrapper.spotify.models.Artist> artistList = pullArtists(api, artistIdArrayList);
+                            if (artistList != null) {
+                                for (com.wrapper.spotify.models.Artist artist : artistList) {
+                                    artistRepository.saveAndFlush(DownstreamMapper.mapArtist(artist));
+                                    log.info("Saved Artist: {} to the database", artist.getName());
+                                }
+                            }
+
+                            for (Track track : trackArrayList) {
+                                songRepository.saveAndFlush(DownstreamMapper.mapSong(track));
+                                log.info("Saved Song: {} to the database", track.getName());
                             }
                         }
                     }
