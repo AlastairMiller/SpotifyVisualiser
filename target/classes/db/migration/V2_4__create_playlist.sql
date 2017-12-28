@@ -7,7 +7,6 @@ CREATE TABLE PLAYLIST (
   ID               VARCHAR(100),
   NAME             VARCHAR(100),
   OWNER_ID         VARCHAR(100),
-  SNAPSHOTID       VARCHAR(100),
-  TRACKS           VARCHAR(100)
+  SNAPSHOTID       VARCHAR(100)
 
 );
