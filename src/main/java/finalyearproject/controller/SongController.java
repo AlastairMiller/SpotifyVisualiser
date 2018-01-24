@@ -30,6 +30,12 @@ public class SongController {
         return songRepository.getOne(id);
     }
 
+    @RequestMapping(value = "songs/random", method = RequestMethod.GET)
+    public Song get(){
+        System.out.println(songRepository.findRandom());
+      return songRepository.findById(songRepository.findRandom());
+    }
+
     @RequestMapping(value = "songs/{id}", method = RequestMethod.PUT)
     public Song update(@PathVariable String id, @RequestBody Song song) {
         Song existingSong = songRepository.findOne(id);
