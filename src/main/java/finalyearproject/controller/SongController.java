@@ -12,28 +12,23 @@ import java.util.List;
 @RequestMapping("api/v1/")
 public class SongController {
 
+    //Todo Constructor
     @Autowired
     private SongRepository songRepository;
 
-    @RequestMapping(value ="songs", method = RequestMethod.GET)
-    public List<Song> list(){
+    @RequestMapping(value = "songs", method = RequestMethod.GET)
+    public List<Song> list() {
         return songRepository.findAll();
     }
 
     @RequestMapping(value = "songs", method = RequestMethod.POST)
-    public Song create(@RequestBody Song song){
+    public Song create(@RequestBody Song song) {
         return songRepository.saveAndFlush(song);
     }
 
     @RequestMapping(value = "songs/{id}", method = RequestMethod.GET)
     public Song get(@PathVariable String id) {
         return songRepository.getOne(id);
-    }
-
-    @RequestMapping(value = "songs/random", method = RequestMethod.GET)
-    public Song get(){
-        System.out.println(songRepository.findRandom());
-      return songRepository.findById(songRepository.findRandom());
     }
 
     @RequestMapping(value = "songs/{id}", method = RequestMethod.PUT)

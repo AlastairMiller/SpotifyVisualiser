@@ -60,7 +60,7 @@ public class RefreshLocalDb {
         pullLocationPlaylists(api);
         pullFeaturedPlaylists(api);
         //To pull playlists from user declared endpoint.
-        if (playlistsToPull.size() > 0) {
+        if (!playlistsToPull.isEmpty()) {
             for (Playlist aPlaylistToPull : playlistsToPull) {
                 pullPlaylist(api, aPlaylistToPull);
             }
@@ -100,7 +100,7 @@ public class RefreshLocalDb {
 
     private void saveSimplePlaylistsToDatastore(Api api, List<SimplePlaylist> playlistsToSave) {
         for (SimplePlaylist simplePlaylist : playlistsToSave) {
-            com.wrapper.spotify.models.Playlist fullPlaylist = convertSimplePlaylisttoPlaylist(api, simplePlaylist);
+            com.wrapper.spotify.models.Playlist fullPlaylist = convertSimplePlaylistToPlaylist(api, simplePlaylist);
 
             if (fullPlaylist != null) {
 
@@ -172,7 +172,6 @@ public class RefreshLocalDb {
             return request.get();
         } catch (Exception e) {
             log.error("Cannot download metadata for song with id {}, HTTP Status code: {}", id, e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
@@ -181,7 +180,7 @@ public class RefreshLocalDb {
         List<Track> pulledTracks = new ArrayList<Track>();
         if (ids.size() > 50) {
             final TracksRequest request = api.getTracks(ids.subList(0, 49)).build();
-            ids = new ArrayList<String>(ids.subList(49, ids.size()));
+            ids = new ArrayList<>(ids.subList(49, ids.size()));
             try {
                 pulledTracks.addAll(request.get());
             } catch (Exception e) {
@@ -203,7 +202,7 @@ public class RefreshLocalDb {
     }
 
     public static com.wrapper.spotify.models.Artist pullArtist(Api api, String id) {
-        final ArtistRequest request = api.getArtist(id).build();
+        ArtistRequest request = api.getArtist(id).build();
         try {
             return request.get();
         } catch (Exception e) {
@@ -237,7 +236,7 @@ public class RefreshLocalDb {
         }
     }
 
-    private com.wrapper.spotify.models.Playlist convertSimplePlaylisttoPlaylist(Api api, SimplePlaylist simplePlaylist) {
+    private com.wrapper.spotify.models.Playlist convertSimplePlaylistToPlaylist(Api api, SimplePlaylist simplePlaylist) {
         return pullPlaylist(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
     }
 
