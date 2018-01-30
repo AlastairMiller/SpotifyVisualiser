@@ -18,10 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,7 +35,7 @@ public class RefreshE2E {
 
     @Test
     public void pullSongAndStoreInDB() {
-        Api api = authenticationService.clientCredentialflow();
+        Api api = authenticationService.clientCredentialFlow();
         Track track = RefreshLocalDb.pullSong(api, "3fJaqjV813edLN5wrxUPkc");
         assert track != null;
         Song song = DownstreamMapper.mapSong(track);

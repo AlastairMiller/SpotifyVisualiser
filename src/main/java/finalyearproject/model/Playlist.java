@@ -20,16 +20,16 @@ import java.util.List;
 @Entity
 public class Playlist {
     @Id
-    String id;
-    URI uri;
-    URL externalURL;
-    Integer numOfFollowers;
-    String href;
+    private String id;
+    private URI uri;
+    private URL externalURL;
+    private Integer numOfFollowers;
+    private String href;
     @ElementCollection
-    List<String> images;
-    String name;
+    private List<String> images;
+    private String name;
     @ManyToOne
-    User owner;
+    private User owner;
     @ElementCollection
-    List<Song> tracks;
+    private List<Song> tracks;
 }

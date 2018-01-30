@@ -21,20 +21,20 @@ import java.util.List;
 @AllArgsConstructor
 public class Song {
     @Id
-    String id;
+    private String id;
     @ElementCollection
-    List<Artist> artists;
+    private List<Artist> artists;
     @ElementCollection
-    List<String> availableMarkets;
-    int discNum;
-    int durationMs;
-    boolean explicit;
-    URL externalURL;
-    String href;
-    String name;
-    URL previewURL;
-    int trackNumber;
-    int popularity;
-    URI uri;
+    private List<String> availableMarkets;
+    private int discNum;
+    private int durationMs;
+    private boolean explicit;
+    private URL externalURL;
+    private String href;
+    private String name;
+    private URL previewURL;
+    private int trackNumber;
+    private int popularity;
+    private URI uri;
 
 }

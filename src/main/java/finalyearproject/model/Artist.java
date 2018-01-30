@@ -21,14 +21,14 @@ import java.util.List;
 @Builder
 public class Artist {
     @Id
-    String id;
-    URL externalURL;
+    private String id;
+    private URL externalURL;
     @ElementCollection
-    List<String> genres;
-    String href;
-    String name;
-    String type;
-    int followers;
-    int popularity;
-    URI uri;
+    private List<String> genres;
+    private String href;
+    private String name;
+    private String type;
+    private  int followers;
+    private int popularity;
+    private URI uri;
 }

@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-    String clientId;
-    String clientSecret;
+    private final String clientId;
+    private final String clientSecret;
 
     @Autowired
     public AuthenticationService(@Value("${clientId}") String clientId, @Value("${clientSecret}") String clientSecret) {
@@ -26,7 +26,7 @@ public class AuthenticationService {
         this.clientSecret = clientSecret;
     }
 
-    public Api clientCredentialflow() {
+    public Api clientCredentialFlow() {
         final Api api = Api.builder()
                 .clientId(this.clientId)
                 .clientSecret(this.clientSecret)

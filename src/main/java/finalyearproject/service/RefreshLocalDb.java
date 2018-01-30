@@ -54,12 +54,12 @@ public class RefreshLocalDb {
 
     @Scheduled(fixedDelay = 10000)
     public void main() {
-        Api api = authenticationService.clientCredentialflow();
+        Api api = authenticationService.clientCredentialFlow();
         log.info("-----------------------Database refresh started-----------------------");
         List<Playlist> playlistsToPull = playlistRepository.findByName(null);
         pullLocationPlaylists(api);
         pullFeaturedPlaylists(api);
-        //To pull playlists from user declared endpoint.
+        //TODO pull playlists from user.
         if (!playlistsToPull.isEmpty()) {
             for (Playlist aPlaylistToPull : playlistsToPull) {
                 pullPlaylist(api, aPlaylistToPull);
@@ -73,8 +73,13 @@ public class RefreshLocalDb {
         log.info("-----------------------Pulling Location Playlists-----------------------");
         List<SimplePlaylist> playlists = pullPlaylistsForAUser(api, "thesoundsofspotify", 0);
         playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
+//        playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches("\\w*[A-Z][A-Z]\\b"));
+        for (int i = 0; i < playlists.size(); i++) {
+            if (playlists.get(i).getName().matches(".*[A-Z][A-Z]\\b")) {
+                playlists.remove(i);
+            }
+        }
         saveSimplePlaylistsToDatastore(api, playlists);
-
     }
 
     private void pullFeaturedPlaylists(Api api) {
@@ -94,7 +99,6 @@ public class RefreshLocalDb {
             saveSimplePlaylistsToDatastore(api, featuredPlaylistList);
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -103,8 +107,9 @@ public class RefreshLocalDb {
             com.wrapper.spotify.models.Playlist fullPlaylist = convertSimplePlaylistToPlaylist(api, simplePlaylist);
 
             if (fullPlaylist != null) {
-
                 Playlist newPlaylist = DownstreamMapper.mapPlaylist(fullPlaylist);
+
+                playlistCleanup(newPlaylist);
 
                 if (userRepository.findById(fullPlaylist.getOwner().getId()) == null) {
 
@@ -244,6 +249,7 @@ public class RefreshLocalDb {
         final UserPlaylistsRequest request = api.getPlaylistsForUser(userId).limit(50).offset(offset).build();
         try {
             List<SimplePlaylist> usersPlaylist = new ArrayList<SimplePlaylist>(request.get().getItems());
+            log.info("Pulled {} playlists for user {}", offset, userId);
             if (usersPlaylist.size() == 50) {
                 usersPlaylist.addAll(pullPlaylistsForAUser(api, userId, offset + 50));
             }
@@ -265,8 +271,24 @@ public class RefreshLocalDb {
             return request.get();
         } catch (Exception e) {
             log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
+            return null;
         }
-        return null;
+
+    }
+
+    void playlistCleanup(Playlist newPlaylist) {
+        Playlist storedPlaylist = playlistRepository.findOne(newPlaylist.getId());
+        for (int i = 0; i < storedPlaylist.getTracks().size(); i++) {
+            for (int p = 0; p < newPlaylist.getTracks().size(); p++) {
+                if (storedPlaylist.getTracks().get(i).equals(newPlaylist.getTracks().get(p))) {
+                    break;
+                }
+            }
+            log.info("Removing song: {} from playlist: {}", storedPlaylist.getTracks().get(i).getName(), storedPlaylist.getName());
+            storedPlaylist.getTracks().remove(i);
+        }
+        playlistRepository.delete(newPlaylist.getId());
+        playlistRepository.saveAndFlush(storedPlaylist);
     }
 
 }

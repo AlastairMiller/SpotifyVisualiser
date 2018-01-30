@@ -118,7 +118,7 @@ public class DownstreamMapper {
     }
 
     public static Playlist mapPlaylist(com.wrapper.spotify.models.Playlist fullPlaylist){
-        List<String> imageUrls = new ArrayList<String>();
+        List<String> imageUrls = new ArrayList<>();
         if(fullPlaylist.getImages()!=null) {
             for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
                 imageUrls.add(fullPlaylist.getImages().get(i).getUrl());

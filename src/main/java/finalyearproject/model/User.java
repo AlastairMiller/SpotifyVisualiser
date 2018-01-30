@@ -17,12 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 public class User {
     @Id
-    String id;
-    URI uri;
-    String displayName;
-    URL externalUrl;
-    Integer numOfFollowers;
-    String href;
+    private String id;
+    private URI uri;
+    private String displayName;
+    private URL externalUrl;
+    private Integer numOfFollowers;
+    private String href;
     @ElementCollection
-    List<String> images;
+    private List<String> images;
 }

@@ -82,7 +82,7 @@ public class AppTest {
     @Test
     public void retrieveSongFromApi() {
         AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
-        Api api = authenticationService.clientCredentialflow();
+        Api api = authenticationService.clientCredentialFlow();
         final TrackRequest request = api.getTrack("3fJaqjV813edLN5wrxUPkc").build();
 
         try {
@@ -98,7 +98,7 @@ public class AppTest {
     @Test
     public void retrievePlaylistFromApi() {
         AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
-        Api api = authenticationService.clientCredentialflow();
+        Api api = authenticationService.clientCredentialFlow();
         final PlaylistRequest request = api.getPlaylist("spotifycharts", "37i9dQZEVXbMDoHDwVN2tF").build();
         try {
             final Playlist playlist = request.get();
@@ -112,7 +112,7 @@ public class AppTest {
     @Test
     public void retrieveAlbumFromApi() {
         AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
-        Api api = authenticationService.clientCredentialflow();
+        Api api = authenticationService.clientCredentialFlow();
         final AlbumRequest request = api.getAlbum("0HEKWtu7St3tKgZDKZsX90").build();
 
         try {
@@ -129,7 +129,7 @@ public class AppTest {
     @Test
     public void retrieveArtistFromApi() {
         AuthenticationService authenticationService = new AuthenticationService(clientID, clientSecret);
-        Api api = authenticationService.clientCredentialflow();
+        Api api = authenticationService.clientCredentialFlow();
 
         final ArtistRequest request = api.getArtist("6hN9F0iuULZYWXppob22Aj").build();
 
