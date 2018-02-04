@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-import javax.persistence.*;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -30,6 +30,6 @@ public class Playlist {
     private String name;
     @ManyToOne
     private User owner;
-    @ElementCollection
+    @ElementCollection()
     private List<Song> tracks;
 }

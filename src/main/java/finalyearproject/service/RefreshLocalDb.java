@@ -8,6 +8,7 @@ import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 import com.wrapper.spotify.models.User;
 import finalyearproject.model.Playlist;
+import finalyearproject.model.Song;
 import finalyearproject.repository.ArtistRepository;
 import finalyearproject.repository.PlaylistRepository;
 import finalyearproject.repository.SongRepository;
@@ -30,7 +31,6 @@ import java.util.List;
 public class RefreshLocalDb {
 
     //TODO 1. Catch when access token expires
-    //TODO 2. Remove all local songs which do not match with latest version of playlist
     //TODO 3. Write UI
     //TODO 4. Write user comparision service/module
     //TODO 5. Write documentation
@@ -73,7 +73,7 @@ public class RefreshLocalDb {
         log.info("-----------------------Pulling Location Playlists-----------------------");
         List<SimplePlaylist> playlists = pullPlaylistsForAUser(api, "thesoundsofspotify", 0);
         playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
-//        playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches("\\w*[A-Z][A-Z]\\b"));
+        playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches("\\w*[A-Z][A-Z]\\b"));
         for (int i = 0; i < playlists.size(); i++) {
             if (playlists.get(i).getName().matches(".*[A-Z][A-Z]\\b")) {
                 playlists.remove(i);
@@ -102,60 +102,71 @@ public class RefreshLocalDb {
         }
     }
 
+    private void saveSpotifyPlaylist(Api api, com.wrapper.spotify.models.Playlist fullPlaylist) {
+        Playlist newPlaylist = DownstreamMapper.mapPlaylist(fullPlaylist);
+        savePlaylist(api, newPlaylist);
+    }
+
+    private void savePlaylist(Api api, Playlist fullPlaylist) {
+
+        if (playlistRepository.findById(fullPlaylist.getId()) != null) {
+            playlistCleanup(api, fullPlaylist);
+        }
+
+        if (userRepository.findById(fullPlaylist.getOwner().getId()) == null) {
+
+            finalyearproject.model.User newUser = DownstreamMapper.mapUser(pullUser(api, fullPlaylist.getOwner().getId()));
+            userRepository.saveAndFlush(newUser);
+
+        }
+        ArrayList<String> songIdArrayList = new ArrayList<String>();
+        for (int i = 0; i < fullPlaylist.getTracks().size(); i++) {
+            if (songRepository.findById(fullPlaylist.getTracks().get(i).getId()) == null) {
+                songIdArrayList.add(fullPlaylist.getTracks().get(i).getId());
+            }
+        }
+        if (songIdArrayList.size() > 0) {
+            List<Track> trackArrayList = pullSongs(api, songIdArrayList);
+            if (trackArrayList != null) {
+                ArrayList<String> artistIdArrayList = new ArrayList<String>();
+                for (Track track : trackArrayList) {
+                    if (track != null) {
+                        for (int p = 0; p < track.getArtists().size(); p++) {
+                            if (artistRepository.findById(track.getArtists().get(p).getId()) == null) {
+                                artistIdArrayList.add(track.getArtists().get(p).getId());
+                            }
+                        }
+                    }
+                }
+
+                List<com.wrapper.spotify.models.Artist> artistList = pullArtists(api, artistIdArrayList);
+                if (artistList != null) {
+                    for (com.wrapper.spotify.models.Artist artist : artistList) {
+                        artistRepository.saveAndFlush(DownstreamMapper.mapArtist(artist));
+                        log.info("Saved Artist: {} to the database", artist.getName());
+                    }
+                }
+
+                for (Track track : trackArrayList) {
+                    songRepository.saveAndFlush(DownstreamMapper.mapSong(track));
+                    log.info("Saved Song: {} to the database", track.getName());
+                }
+            }
+        }
+
+        playlistRepository.saveAndFlush(fullPlaylist);
+        log.info("Saved a playlist called {}", fullPlaylist.getName());
+    }
+
     private void saveSimplePlaylistsToDatastore(Api api, List<SimplePlaylist> playlistsToSave) {
         for (SimplePlaylist simplePlaylist : playlistsToSave) {
             com.wrapper.spotify.models.Playlist fullPlaylist = convertSimplePlaylistToPlaylist(api, simplePlaylist);
-
             if (fullPlaylist != null) {
-                Playlist newPlaylist = DownstreamMapper.mapPlaylist(fullPlaylist);
-
-                playlistCleanup(newPlaylist);
-
-                if (userRepository.findById(fullPlaylist.getOwner().getId()) == null) {
-
-                    finalyearproject.model.User newUser = DownstreamMapper.mapUser(pullUser(api, fullPlaylist.getOwner().getId()));
-                    userRepository.saveAndFlush(newUser);
-
+                if (playlistRepository.findById(fullPlaylist.getId()) == null) {
+                    saveSpotifyPlaylist(api, fullPlaylist);
+                } else {
+                    playlistCleanup(api, DownstreamMapper.mapPlaylist(fullPlaylist));
                 }
-                ArrayList<String> songIdArrayList = new ArrayList<String>();
-                for (int i = 0; i < fullPlaylist.getTracks().getItems().size(); i++) {
-                    if (songRepository.findById(fullPlaylist.getTracks().getItems().get(i).getTrack().getId()) == null) {
-                        songIdArrayList.add(fullPlaylist.getTracks().getItems().get(i).getTrack().getId());
-
-                    }
-                }
-                if (songIdArrayList.size() > 0) {
-                    List<Track> trackArrayList = pullSongs(api, songIdArrayList);
-                    if (trackArrayList != null) {
-                        ArrayList<String> artistIdArrayList = new ArrayList<String>();
-                        for (Track track : trackArrayList) {
-                            if (track != null) {
-                                for (int p = 0; p < track.getArtists().size(); p++) {
-                                    if (artistRepository.findById(track.getArtists().get(p).getId()) == null) {
-                                        artistIdArrayList.add(track.getArtists().get(p).getId());
-                                    }
-                                }
-                            }
-                        }
-
-                        List<com.wrapper.spotify.models.Artist> artistList = pullArtists(api, artistIdArrayList);
-                        if (artistList != null) {
-                            for (com.wrapper.spotify.models.Artist artist : artistList) {
-                                artistRepository.saveAndFlush(DownstreamMapper.mapArtist(artist));
-                                log.info("Saved Artist: {} to the database", artist.getName());
-                            }
-                        }
-
-                        for (Track track : trackArrayList) {
-                            songRepository.saveAndFlush(DownstreamMapper.mapSong(track));
-                            log.info("Saved Song: {} to the database", track.getName());
-                        }
-                    }
-                }
-
-
-                playlistRepository.saveAndFlush(newPlaylist);
-                log.info("Saved a playlist called {}", newPlaylist.getName());
             }
         }
     }
@@ -260,12 +271,11 @@ public class RefreshLocalDb {
         }
     }
 
-
     com.wrapper.spotify.models.Playlist pullPlaylist(Api api, Playlist playlistToPull) {
         return pullPlaylist(api, playlistToPull.getOwner().getId(), playlistToPull.getId());
     }
 
-    com.wrapper.spotify.models.Playlist pullPlaylist(Api api, String ownerId, String playlistId) {
+    private com.wrapper.spotify.models.Playlist pullPlaylist(Api api, String ownerId, String playlistId) {
         final PlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
         try {
             return request.get();
@@ -276,19 +286,23 @@ public class RefreshLocalDb {
 
     }
 
-    void playlistCleanup(Playlist newPlaylist) {
-        Playlist storedPlaylist = playlistRepository.findOne(newPlaylist.getId());
-        for (int i = 0; i < storedPlaylist.getTracks().size(); i++) {
+    private void playlistCleanup(Api api, Playlist newPlaylist) {
+        List<Song> storedTracks = playlistRepository.findOne(newPlaylist.getId()).getTracks();
+        for (int i = 0; i < storedTracks.size(); i++) {
+            Boolean remove = true;
             for (int p = 0; p < newPlaylist.getTracks().size(); p++) {
-                if (storedPlaylist.getTracks().get(i).equals(newPlaylist.getTracks().get(p))) {
-                    break;
+                if (storedTracks.get(i).getId().equals(newPlaylist.getTracks().get(p).getId())) {
+                    remove = false;
+                    p = newPlaylist.getTracks().size() - 1;
                 }
             }
-            log.info("Removing song: {} from playlist: {}", storedPlaylist.getTracks().get(i).getName(), storedPlaylist.getName());
-            storedPlaylist.getTracks().remove(i);
+            if (remove) {
+                log.info("Removing song: {} from playlist: {}", storedTracks.get(i).getName(), newPlaylist.getName());
+                storedTracks.remove(i);
+            }
         }
         playlistRepository.delete(newPlaylist.getId());
-        playlistRepository.saveAndFlush(storedPlaylist);
+        savePlaylist(api, newPlaylist);
     }
 
 }
