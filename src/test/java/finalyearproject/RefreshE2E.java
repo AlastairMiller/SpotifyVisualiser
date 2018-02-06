@@ -3,7 +3,7 @@ package finalyearproject;
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.models.Track;
 import finalyearproject.model.RefinedTrack;
-import finalyearproject.repository.SongRepository;
+import finalyearproject.repository.TrackRepository;
 import finalyearproject.service.AuthenticationService;
 import finalyearproject.service.RefreshLocalDbService;
 import finalyearproject.utilities.DownstreamMapper;
@@ -30,7 +30,7 @@ public class RefreshE2E {
     @Autowired
     AuthenticationService authenticationService;
     @Autowired
-    SongRepository songRepository;
+    TrackRepository trackRepository;
 
 
     @Test
@@ -39,15 +39,15 @@ public class RefreshE2E {
         Track track = RefreshLocalDbService.pullSong(api, "3fJaqjV813edLN5wrxUPkc");
         assert track != null;
         RefinedTrack refinedTrack = DownstreamMapper.mapSong(track);
-        songRepository.saveAndFlush(refinedTrack);
-        RefinedTrack newRefinedTrack = songRepository.findById(refinedTrack.getId());
+        trackRepository.saveAndFlush(refinedTrack);
+        RefinedTrack newRefinedTrack = trackRepository.findById(refinedTrack.getId());
         assertEquals(refinedTrack, newRefinedTrack);
 
     }
 
     @After
     public void cleanup() {
-        songRepository.deleteAll();
+        trackRepository.deleteAll();
     }
 
     @Configuration

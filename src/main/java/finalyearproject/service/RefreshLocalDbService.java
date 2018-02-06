@@ -12,7 +12,7 @@ import finalyearproject.model.RefinedTrack;
 import finalyearproject.model.RefinedUser;
 import finalyearproject.repository.ArtistRepository;
 import finalyearproject.repository.PlaylistRepository;
-import finalyearproject.repository.SongRepository;
+import finalyearproject.repository.TrackRepository;
 import finalyearproject.repository.UserRepository;
 import finalyearproject.utilities.DownstreamMapper;
 import lombok.AccessLevel;
@@ -40,15 +40,15 @@ public class RefreshLocalDbService {
     PlaylistRepository playlistRepository;
     AuthenticationService authenticationService;
     UserRepository userRepository;
-    SongRepository songRepository;
+    TrackRepository trackRepository;
     ArtistRepository artistRepository;
 
     @Autowired
-    public RefreshLocalDbService(AuthenticationService authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, SongRepository songRepository, ArtistRepository artistRepository) {
+    public RefreshLocalDbService(AuthenticationService authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, TrackRepository trackRepository, ArtistRepository artistRepository) {
         this.authenticationService = authenticationService;
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
-        this.songRepository = songRepository;
+        this.trackRepository = trackRepository;
         this.artistRepository = artistRepository;
     }
 
@@ -122,7 +122,7 @@ public class RefreshLocalDbService {
         }
         ArrayList<String> songIdArrayList = new ArrayList<String>();
         for (int i = 0; i < fullRefinedPlaylist.getTracks().size(); i++) {
-            if (songRepository.findById(fullRefinedPlaylist.getTracks().get(i).getId()) == null) {
+            if (trackRepository.findById(fullRefinedPlaylist.getTracks().get(i).getId()) == null) {
                 songIdArrayList.add(fullRefinedPlaylist.getTracks().get(i).getId());
             }
         }
@@ -149,7 +149,7 @@ public class RefreshLocalDbService {
                 }
 
                 for (Track track : trackArrayList) {
-                    songRepository.saveAndFlush(DownstreamMapper.mapSong(track));
+                    trackRepository.saveAndFlush(DownstreamMapper.mapSong(track));
                     log.info("Saved Song: {} to the database", track.getName());
                 }
             }
