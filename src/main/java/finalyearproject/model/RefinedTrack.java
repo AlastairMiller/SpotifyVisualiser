@@ -8,28 +8,31 @@ import lombok.NoArgsConstructor;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Entity
-public class Playlist {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class RefinedTrack {
     @Id
     private String id;
-    private URI uri;
-    private URL externalURL;
-    private Integer numOfFollowers;
-    private String href;
     @ElementCollection
-    private List<String> images;
+    private List<RefinedArtist> artists;
+    @ElementCollection
+    private List<String> availableMarkets;
+    private int discNum;
+    private int durationMs;
+    private boolean explicit;
+    private URL externalURL;
+    private String href;
     private String name;
-    @ManyToOne
-    private User owner;
-    @ElementCollection()
-    private List<Song> tracks;
+    private URL previewURL;
+    private int trackNumber;
+    private int popularity;
+    private URI uri;
+
 }

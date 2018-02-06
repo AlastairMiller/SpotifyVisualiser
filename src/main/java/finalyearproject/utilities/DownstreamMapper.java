@@ -1,10 +1,10 @@
 package finalyearproject.utilities;
 
 import com.wrapper.spotify.models.Track;
-import finalyearproject.model.Artist;
-import finalyearproject.model.Playlist;
-import finalyearproject.model.Song;
-import finalyearproject.model.User;
+import finalyearproject.model.RefinedArtist;
+import finalyearproject.model.RefinedPlaylist;
+import finalyearproject.model.RefinedTrack;
+import finalyearproject.model.RefinedUser;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -14,15 +14,15 @@ import java.util.List;
 
 public class DownstreamMapper {
 
-    public static Song mapSong(Track fullTrack) {
-        List<Artist> minimisedArtists = new ArrayList<Artist>();
+    public static RefinedTrack mapSong(Track fullTrack) {
+        List<RefinedArtist> minimisedRefinedArtists = new ArrayList<RefinedArtist>();
         for (int i = 0; i < fullTrack.getArtists().size(); i++) {
-            minimisedArtists.add(mapSimpleArtist(fullTrack.getArtists().get(i)));
+            minimisedRefinedArtists.add(mapSimpleArtist(fullTrack.getArtists().get(i)));
         }
         try {
-            return Song.builder()
+            return RefinedTrack.builder()
                     .id(fullTrack.getId())
-                    .artists(minimisedArtists)
+                    .artists(minimisedRefinedArtists)
                     .availableMarkets(fullTrack.getAvailableMarkets())
                     .discNum(fullTrack.getDiscNumber())
                     .durationMs(fullTrack.getDuration())
@@ -36,9 +36,9 @@ public class DownstreamMapper {
                     .uri(URI.create(fullTrack.getUri()))
                     .build();
         } catch (MalformedURLException e) {
-            return Song.builder()
+            return RefinedTrack.builder()
                     .id(fullTrack.getId())
-                    .artists(minimisedArtists)
+                    .artists(minimisedRefinedArtists)
                     .availableMarkets(fullTrack.getAvailableMarkets())
                     .discNum(fullTrack.getDiscNumber())
                     .durationMs(fullTrack.getDuration())
@@ -52,9 +52,9 @@ public class DownstreamMapper {
         }
     }
 
-    public static Artist mapSimpleArtist(com.wrapper.spotify.models.SimpleArtist fullArtist) {
+    public static RefinedArtist mapSimpleArtist(com.wrapper.spotify.models.SimpleArtist fullArtist) {
         try {
-            return Artist.builder()
+            return RefinedArtist.builder()
                     .id(fullArtist.getId())
                     .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
                     .href(fullArtist.getHref())
@@ -63,7 +63,7 @@ public class DownstreamMapper {
                     .uri(URI.create(fullArtist.getUri()))
                     .build();
         } catch (MalformedURLException e) {
-            return Artist.builder()
+            return RefinedArtist.builder()
                     .id(fullArtist.getId())
                     .href(fullArtist.getHref())
                     .name(fullArtist.getName())
@@ -73,9 +73,9 @@ public class DownstreamMapper {
         }
     }
 
-    public static Artist mapArtist(com.wrapper.spotify.models.Artist fullArtist) {
+    public static RefinedArtist mapArtist(com.wrapper.spotify.models.Artist fullArtist) {
         try {
-            return Artist.builder()
+            return RefinedArtist.builder()
                     .id(fullArtist.getId())
                     .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
                     .genres(fullArtist.getGenres())
@@ -87,7 +87,7 @@ public class DownstreamMapper {
                     .popularity(fullArtist.getPopularity())
                     .build();
         } catch (MalformedURLException e) {
-            return Artist.builder()
+            return RefinedArtist.builder()
                     .id(fullArtist.getId())
                     .genres(fullArtist.getGenres())
                     .href(fullArtist.getHref())
@@ -100,14 +100,14 @@ public class DownstreamMapper {
         }
     }
 
-    public static User mapUser(com.wrapper.spotify.models.User fullUser) {
+    public static RefinedUser mapUser(com.wrapper.spotify.models.User fullUser) {
         List<String> imageUrls = new ArrayList<String>();
         if( fullUser.getImages()!=null) {
             for (int i = 0; i < fullUser.getImages().size(); i++) {
                 imageUrls.add(fullUser.getImages().get(i).getUrl());
             }
         }
-        return User.builder()
+        return RefinedUser.builder()
                 .id(fullUser.getId())
                 .uri(URI.create(fullUser.getUri()))
                 .displayName(fullUser.getDisplayName())
@@ -117,19 +117,19 @@ public class DownstreamMapper {
                 .build();
     }
 
-    public static Playlist mapPlaylist(com.wrapper.spotify.models.Playlist fullPlaylist){
+    public static RefinedPlaylist mapPlaylist(com.wrapper.spotify.models.Playlist fullPlaylist){
         List<String> imageUrls = new ArrayList<>();
         if(fullPlaylist.getImages()!=null) {
             for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
                 imageUrls.add(fullPlaylist.getImages().get(i).getUrl());
             }
         }
-        List<Song> formattedSongs = new ArrayList<Song>();
+        List<RefinedTrack> formattedRefinedTracks = new ArrayList<RefinedTrack>();
         for (int n = 0; n < fullPlaylist.getTracks().getItems().size(); n++) {
-            formattedSongs.add(mapSong(fullPlaylist.getTracks().getItems().get(n).getTrack()));
+            formattedRefinedTracks.add(mapSong(fullPlaylist.getTracks().getItems().get(n).getTrack()));
         }
         try {
-            return Playlist.builder()
+            return RefinedPlaylist.builder()
                     .id(fullPlaylist.getId())
                     .uri(URI.create(fullPlaylist.getUri()))
                     .externalURL(new URL(fullPlaylist.getExternalUrls().get("spotify")))
@@ -138,10 +138,10 @@ public class DownstreamMapper {
                     .images(imageUrls)
                     .name(fullPlaylist.getName())
                     .owner(mapUser(fullPlaylist.getOwner()))
-                    .tracks(formattedSongs)
+                    .tracks(formattedRefinedTracks)
                     .build();
         } catch (MalformedURLException e) {
-            return Playlist.builder()
+            return RefinedPlaylist.builder()
                     .id(fullPlaylist.getId())
                     .uri(URI.create(fullPlaylist.getUri()))
                     .numOfFollowers(fullPlaylist.getFollowers().getTotal())
@@ -149,7 +149,7 @@ public class DownstreamMapper {
                     .images(imageUrls)
                     .name(fullPlaylist.getName())
                     .owner(mapUser(fullPlaylist.getOwner()))
-                    .tracks(formattedSongs)
+                    .tracks(formattedRefinedTracks)
                     .build();
         }
 

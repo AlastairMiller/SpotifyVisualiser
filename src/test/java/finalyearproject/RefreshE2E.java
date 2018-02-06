@@ -2,10 +2,10 @@ package finalyearproject;
 
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.models.Track;
-import finalyearproject.model.Song;
+import finalyearproject.model.RefinedTrack;
 import finalyearproject.repository.SongRepository;
 import finalyearproject.service.AuthenticationService;
-import finalyearproject.service.RefreshLocalDb;
+import finalyearproject.service.RefreshLocalDbService;
 import finalyearproject.utilities.DownstreamMapper;
 import org.junit.After;
 import org.junit.Test;
@@ -36,12 +36,12 @@ public class RefreshE2E {
     @Test
     public void pullSongAndStoreInDB() {
         Api api = authenticationService.clientCredentialFlow();
-        Track track = RefreshLocalDb.pullSong(api, "3fJaqjV813edLN5wrxUPkc");
+        Track track = RefreshLocalDbService.pullSong(api, "3fJaqjV813edLN5wrxUPkc");
         assert track != null;
-        Song song = DownstreamMapper.mapSong(track);
-        songRepository.saveAndFlush(song);
-        Song newSong = songRepository.findById(song.getId());
-        assertEquals(song, newSong);
+        RefinedTrack refinedTrack = DownstreamMapper.mapSong(track);
+        songRepository.saveAndFlush(refinedTrack);
+        RefinedTrack newRefinedTrack = songRepository.findById(refinedTrack.getId());
+        assertEquals(refinedTrack, newRefinedTrack);
 
     }
 

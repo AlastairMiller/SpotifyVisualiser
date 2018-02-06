@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Builder
-public class Artist {
+public class RefinedArtist {
     @Id
     private String id;
     private URL externalURL;

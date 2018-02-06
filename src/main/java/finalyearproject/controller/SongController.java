@@ -1,6 +1,6 @@
 package finalyearproject.controller;
 
-import finalyearproject.model.Song;
+import finalyearproject.model.RefinedTrack;
 import finalyearproject.repository.SongRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,32 +16,32 @@ public class SongController {
     private SongRepository songRepository;
 
     @RequestMapping(value = "songs", method = RequestMethod.GET)
-    public List<Song> list() {
+    public List<RefinedTrack> list() {
         return songRepository.findAll();
     }
 
     @RequestMapping(value = "songs", method = RequestMethod.POST)
-    public Song create(@RequestBody Song song) {
-        return songRepository.saveAndFlush(song);
+    public RefinedTrack create(@RequestBody RefinedTrack refinedTrack) {
+        return songRepository.saveAndFlush(refinedTrack);
     }
 
     @RequestMapping(value = "songs/{id}", method = RequestMethod.GET)
-    public Song get(@PathVariable String id) {
+    public RefinedTrack get(@PathVariable String id) {
         return songRepository.getOne(id);
     }
 
     @RequestMapping(value = "songs/{id}", method = RequestMethod.PUT)
-    public Song update(@PathVariable String id, @RequestBody Song song) {
-        Song existingSong = songRepository.findOne(id);
-        BeanUtils.copyProperties(song, existingSong);
-        return songRepository.saveAndFlush(existingSong);
+    public RefinedTrack update(@PathVariable String id, @RequestBody RefinedTrack refinedTrack) {
+        RefinedTrack existingRefinedTrack = songRepository.findOne(id);
+        BeanUtils.copyProperties(refinedTrack, existingRefinedTrack);
+        return songRepository.saveAndFlush(existingRefinedTrack);
     }
 
     @RequestMapping(value = "songs/{id}", method = RequestMethod.DELETE)
-    public Song delete(@PathVariable String id) {
-        Song existingSong = songRepository.findOne(id);
-        songRepository.delete(existingSong);
-        return existingSong;
+    public RefinedTrack delete(@PathVariable String id) {
+        RefinedTrack existingRefinedTrack = songRepository.findOne(id);
+        songRepository.delete(existingRefinedTrack);
+        return existingRefinedTrack;
     }
 
 }

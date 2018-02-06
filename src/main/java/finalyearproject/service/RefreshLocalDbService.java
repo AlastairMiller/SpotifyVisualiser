@@ -7,8 +7,9 @@ import com.wrapper.spotify.models.FeaturedPlaylists;
 import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 import com.wrapper.spotify.models.User;
-import finalyearproject.model.Playlist;
-import finalyearproject.model.Song;
+import finalyearproject.model.RefinedPlaylist;
+import finalyearproject.model.RefinedTrack;
+import finalyearproject.model.RefinedUser;
 import finalyearproject.repository.ArtistRepository;
 import finalyearproject.repository.PlaylistRepository;
 import finalyearproject.repository.SongRepository;
@@ -28,7 +29,7 @@ import java.util.List;
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
-public class RefreshLocalDb {
+public class RefreshLocalDbService {
 
     //TODO 1. Catch when access token expires
     //TODO 3. Write UI
@@ -43,7 +44,7 @@ public class RefreshLocalDb {
     ArtistRepository artistRepository;
 
     @Autowired
-    public RefreshLocalDb(AuthenticationService authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, SongRepository songRepository, ArtistRepository artistRepository) {
+    public RefreshLocalDbService(AuthenticationService authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, SongRepository songRepository, ArtistRepository artistRepository) {
         this.authenticationService = authenticationService;
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
@@ -56,13 +57,13 @@ public class RefreshLocalDb {
     public void main() {
         Api api = authenticationService.clientCredentialFlow();
         log.info("-----------------------Database refresh started-----------------------");
-        List<Playlist> playlistsToPull = playlistRepository.findByName(null);
+        List<RefinedPlaylist> playlistsToPull = playlistRepository.findByName(null);
         pullLocationPlaylists(api);
         pullFeaturedPlaylists(api);
         //TODO pull playlists from user.
         if (!playlistsToPull.isEmpty()) {
-            for (Playlist aPlaylistToPull : playlistsToPull) {
-                pullPlaylist(api, aPlaylistToPull);
+            for (RefinedPlaylist aRefinedPlaylistToPull : playlistsToPull) {
+                pullPlaylist(api, aRefinedPlaylistToPull);
             }
         } else {
             log.info("No updates needed to local DB");
@@ -103,26 +104,26 @@ public class RefreshLocalDb {
     }
 
     private void saveSpotifyPlaylist(Api api, com.wrapper.spotify.models.Playlist fullPlaylist) {
-        Playlist newPlaylist = DownstreamMapper.mapPlaylist(fullPlaylist);
-        savePlaylist(api, newPlaylist);
+        RefinedPlaylist newRefinedPlaylist = DownstreamMapper.mapPlaylist(fullPlaylist);
+        savePlaylist(api, newRefinedPlaylist);
     }
 
-    private void savePlaylist(Api api, Playlist fullPlaylist) {
+    private void savePlaylist(Api api, RefinedPlaylist fullRefinedPlaylist) {
 
-        if (playlistRepository.findById(fullPlaylist.getId()) != null) {
-            playlistCleanup(api, fullPlaylist);
+        if (playlistRepository.findById(fullRefinedPlaylist.getId()) != null) {
+            playlistCleanup(api, fullRefinedPlaylist);
         }
 
-        if (userRepository.findById(fullPlaylist.getOwner().getId()) == null) {
+        if (userRepository.findById(fullRefinedPlaylist.getOwner().getId()) == null) {
 
-            finalyearproject.model.User newUser = DownstreamMapper.mapUser(pullUser(api, fullPlaylist.getOwner().getId()));
-            userRepository.saveAndFlush(newUser);
+            RefinedUser newRefinedUser = DownstreamMapper.mapUser(pullUser(api, fullRefinedPlaylist.getOwner().getId()));
+            userRepository.saveAndFlush(newRefinedUser);
 
         }
         ArrayList<String> songIdArrayList = new ArrayList<String>();
-        for (int i = 0; i < fullPlaylist.getTracks().size(); i++) {
-            if (songRepository.findById(fullPlaylist.getTracks().get(i).getId()) == null) {
-                songIdArrayList.add(fullPlaylist.getTracks().get(i).getId());
+        for (int i = 0; i < fullRefinedPlaylist.getTracks().size(); i++) {
+            if (songRepository.findById(fullRefinedPlaylist.getTracks().get(i).getId()) == null) {
+                songIdArrayList.add(fullRefinedPlaylist.getTracks().get(i).getId());
             }
         }
         if (songIdArrayList.size() > 0) {
@@ -154,8 +155,8 @@ public class RefreshLocalDb {
             }
         }
 
-        playlistRepository.saveAndFlush(fullPlaylist);
-        log.info("Saved a playlist called {}", fullPlaylist.getName());
+        playlistRepository.saveAndFlush(fullRefinedPlaylist);
+        log.info("Saved a playlist called {}", fullRefinedPlaylist.getName());
     }
 
     private void saveSimplePlaylistsToDatastore(Api api, List<SimplePlaylist> playlistsToSave) {
@@ -271,8 +272,8 @@ public class RefreshLocalDb {
         }
     }
 
-    com.wrapper.spotify.models.Playlist pullPlaylist(Api api, Playlist playlistToPull) {
-        return pullPlaylist(api, playlistToPull.getOwner().getId(), playlistToPull.getId());
+    com.wrapper.spotify.models.Playlist pullPlaylist(Api api, RefinedPlaylist refinedPlaylistToPull) {
+        return pullPlaylist(api, refinedPlaylistToPull.getOwner().getId(), refinedPlaylistToPull.getId());
     }
 
     private com.wrapper.spotify.models.Playlist pullPlaylist(Api api, String ownerId, String playlistId) {
@@ -286,23 +287,23 @@ public class RefreshLocalDb {
 
     }
 
-    private void playlistCleanup(Api api, Playlist newPlaylist) {
-        List<Song> storedTracks = playlistRepository.findOne(newPlaylist.getId()).getTracks();
+    private void playlistCleanup(Api api, RefinedPlaylist newRefinedPlaylist) {
+        List<RefinedTrack> storedTracks = playlistRepository.findOne(newRefinedPlaylist.getId()).getTracks();
         for (int i = 0; i < storedTracks.size(); i++) {
             Boolean remove = true;
-            for (int p = 0; p < newPlaylist.getTracks().size(); p++) {
-                if (storedTracks.get(i).getId().equals(newPlaylist.getTracks().get(p).getId())) {
+            for (int p = 0; p < newRefinedPlaylist.getTracks().size(); p++) {
+                if (storedTracks.get(i).getId().equals(newRefinedPlaylist.getTracks().get(p).getId())) {
                     remove = false;
-                    p = newPlaylist.getTracks().size() - 1;
+                    p = newRefinedPlaylist.getTracks().size() - 1;
                 }
             }
             if (remove) {
-                log.info("Removing song: {} from playlist: {}", storedTracks.get(i).getName(), newPlaylist.getName());
+                log.info("Removing song: {} from playlist: {}", storedTracks.get(i).getName(), newRefinedPlaylist.getName());
                 storedTracks.remove(i);
             }
         }
-        playlistRepository.delete(newPlaylist.getId());
-        savePlaylist(api, newPlaylist);
+        playlistRepository.delete(newRefinedPlaylist.getId());
+        savePlaylist(api, newRefinedPlaylist);
     }
 
 }

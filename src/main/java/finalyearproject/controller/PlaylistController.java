@@ -1,6 +1,6 @@
 package finalyearproject.controller;
 
-import finalyearproject.model.Playlist;
+import finalyearproject.model.RefinedPlaylist;
 import finalyearproject.repository.PlaylistRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -18,41 +18,41 @@ public class PlaylistController {
     private PlaylistRepository playlistRepository;
 
     @RequestMapping(value = "playlists", method = RequestMethod.GET)
-    public List<Playlist> list() {
+    public List<RefinedPlaylist> list() {
         return playlistRepository.findAll();
     }
 
     @RequestMapping(value = "playlists", method = RequestMethod.POST)
-    public Playlist create(@RequestBody Playlist playlist) {
-        return playlistRepository.saveAndFlush(playlist);
+    public RefinedPlaylist create(@RequestBody RefinedPlaylist refinedPlaylist) {
+        return playlistRepository.saveAndFlush(refinedPlaylist);
     }
 
     @RequestMapping(value = "playlists/{id}", method = RequestMethod.GET)
-    public Playlist get(@PathVariable String id) {
+    public RefinedPlaylist get(@PathVariable String id) {
         return playlistRepository.getOne(id);
     }
 
     @RequestMapping(value = "playlists/{id}", method = RequestMethod.PUT)
-    public Playlist update(@PathVariable String id, @RequestBody Playlist playlist) {
-        Playlist existingPlaylist = playlistRepository.findOne(id);
-        BeanUtils.copyProperties(playlist, existingPlaylist);
-        return playlistRepository.saveAndFlush(existingPlaylist);
+    public RefinedPlaylist update(@PathVariable String id, @RequestBody RefinedPlaylist refinedPlaylist) {
+        RefinedPlaylist existingRefinedPlaylist = playlistRepository.findOne(id);
+        BeanUtils.copyProperties(refinedPlaylist, existingRefinedPlaylist);
+        return playlistRepository.saveAndFlush(existingRefinedPlaylist);
     }
 
     @RequestMapping(value = "playlists/{id}", method = RequestMethod.DELETE)
-    public Playlist delete(@PathVariable String id) {
-        Playlist existingPlaylist = playlistRepository.findOne(id);
-        playlistRepository.delete(existingPlaylist);
-        return existingPlaylist;
+    public RefinedPlaylist delete(@PathVariable String id) {
+        RefinedPlaylist existingRefinedPlaylist = playlistRepository.findOne(id);
+        playlistRepository.delete(existingRefinedPlaylist);
+        return existingRefinedPlaylist;
     }
 
     @RequestMapping(value = "playlists/request", method = RequestMethod.POST)
-    public Playlist create(@RequestBody String playlistId, @RequestBody String playlistOwner) {
-        Playlist playlist = new Playlist();
-        playlist.setId(playlistId);
-        playlist.setName(playlistOwner);
+    public RefinedPlaylist create(@RequestBody String playlistId, @RequestBody String playlistOwner) {
+        RefinedPlaylist refinedPlaylist = new RefinedPlaylist();
+        refinedPlaylist.setId(playlistId);
+        refinedPlaylist.setName(playlistOwner);
         log.info("Playlist Id: " + playlistId + " will be downloaded in the next refresh");
-        return playlistRepository.saveAndFlush(playlist);
+        return playlistRepository.saveAndFlush(refinedPlaylist);
     }
 
 }

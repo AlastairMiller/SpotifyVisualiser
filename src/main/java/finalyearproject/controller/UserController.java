@@ -1,6 +1,6 @@
 package finalyearproject.controller;
 
-import finalyearproject.model.User;
+import finalyearproject.model.RefinedUser;
 import finalyearproject.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,32 +16,32 @@ public class UserController {
     private UserRepository userRepository;
 
     @RequestMapping(value = "users", method = RequestMethod.GET)
-    public List<User> list() {
+    public List<RefinedUser> list() {
         return userRepository.findAll();
     }
 
     @RequestMapping(value = "users", method = RequestMethod.POST)
-    public User create(@RequestBody User user) {
-        return userRepository.saveAndFlush(user);
+    public RefinedUser create(@RequestBody RefinedUser refinedUser) {
+        return userRepository.saveAndFlush(refinedUser);
     }
 
     @RequestMapping(value = "users/{id}", method = RequestMethod.GET)
-    public User get(@PathVariable String id) {
+    public RefinedUser get(@PathVariable String id) {
         return userRepository.getOne(id);
     }
 
     @RequestMapping(value = "users/{id}", method = RequestMethod.PUT)
-    public User update(@PathVariable String id, @RequestBody User user) {
-        User existingUser = userRepository.findOne(id);
-        BeanUtils.copyProperties(user, existingUser);
-        return userRepository.saveAndFlush(existingUser);
+    public RefinedUser update(@PathVariable String id, @RequestBody RefinedUser refinedUser) {
+        RefinedUser existingRefinedUser = userRepository.findOne(id);
+        BeanUtils.copyProperties(refinedUser, existingRefinedUser);
+        return userRepository.saveAndFlush(existingRefinedUser);
     }
 
     @RequestMapping(value = "users/{id}", method = RequestMethod.DELETE)
-    public User delete(@PathVariable String id) {
-        User existingUser = userRepository.findOne(id);
-        userRepository.delete(existingUser);
-        return existingUser;
+    public RefinedUser delete(@PathVariable String id) {
+        RefinedUser existingRefinedUser = userRepository.findOne(id);
+        userRepository.delete(existingRefinedUser);
+        return existingRefinedUser;
     }
 
 }

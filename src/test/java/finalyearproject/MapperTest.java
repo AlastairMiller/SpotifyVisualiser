@@ -1,7 +1,8 @@
 package finalyearproject;
 
 import com.wrapper.spotify.models.*;
-import finalyearproject.model.Song;
+import finalyearproject.model.RefinedTrack;
+import finalyearproject.model.RefinedArtist;
 import finalyearproject.utilities.DownstreamMapper;
 import finalyearproject.utilities.ImageBuilder;
 import lombok.Data;
@@ -93,44 +94,44 @@ public class MapperTest {
 
     @Test
     public void mapSongCorrectly() throws MalformedURLException {
-        Song mappedSong = DownstreamMapper.mapSong(strangers);
-        assertEquals(strangers.getName(), mappedSong.getName());
-        assertEquals(strangers.getArtists().get(0).getId(), mappedSong.getArtists().get(0).getId());
-        assertEquals(strangers.getAvailableMarkets(), mappedSong.getAvailableMarkets());
-        assertEquals(strangers.getDiscNumber(), mappedSong.getDiscNum());
-        assertEquals(strangers.getDuration(), mappedSong.getDurationMs());
-        assertEquals(strangers.getExternalUrls().get("spotify"), mappedSong.getExternalURL().toString());
-        assertEquals(strangers.getHref(), mappedSong.getHref());
-        assertEquals(strangers.getId(), mappedSong.getId());
-        assertEquals(strangers.getPopularity(), mappedSong.getPopularity());
-        assertEquals(strangers.getPreviewUrl(), mappedSong.getPreviewURL().toString());
-        assertEquals(strangers.getTrackNumber(), mappedSong.getTrackNumber());
-        assertEquals(strangers.getUri(), mappedSong.getUri().toString());
-        assertEquals(strangers.getExternalUrls().get("spotify"), mappedSong.getExternalURL().toString());
+        RefinedTrack mappedRefinedTrack = DownstreamMapper.mapSong(strangers);
+        assertEquals(strangers.getName(), mappedRefinedTrack.getName());
+        assertEquals(strangers.getArtists().get(0).getId(), mappedRefinedTrack.getArtists().get(0).getId());
+        assertEquals(strangers.getAvailableMarkets(), mappedRefinedTrack.getAvailableMarkets());
+        assertEquals(strangers.getDiscNumber(), mappedRefinedTrack.getDiscNum());
+        assertEquals(strangers.getDuration(), mappedRefinedTrack.getDurationMs());
+        assertEquals(strangers.getExternalUrls().get("spotify"), mappedRefinedTrack.getExternalURL().toString());
+        assertEquals(strangers.getHref(), mappedRefinedTrack.getHref());
+        assertEquals(strangers.getId(), mappedRefinedTrack.getId());
+        assertEquals(strangers.getPopularity(), mappedRefinedTrack.getPopularity());
+        assertEquals(strangers.getPreviewUrl(), mappedRefinedTrack.getPreviewURL().toString());
+        assertEquals(strangers.getTrackNumber(), mappedRefinedTrack.getTrackNumber());
+        assertEquals(strangers.getUri(), mappedRefinedTrack.getUri().toString());
+        assertEquals(strangers.getExternalUrls().get("spotify"), mappedRefinedTrack.getExternalURL().toString());
     }
 
     @Test
     public void mapSimpleArtistCorrectly() throws MalformedURLException {
-        finalyearproject.model.Artist mappedArtist = DownstreamMapper.mapSimpleArtist(simpleSigrid);
-        assertEquals(simpleSigrid.getHref(),mappedArtist.getHref());
-        assertEquals(simpleSigrid.getId(),mappedArtist.getId());
-        assertEquals(simpleSigrid.getName(),mappedArtist.getName());
-        assertEquals(simpleSigrid.getType().toString().toLowerCase(), mappedArtist.getType());
-        assertEquals(simpleSigrid.getUri(), mappedArtist.getUri().toString());
-        assertEquals(simpleSigrid.getExternalUrls().get("spotify"), mappedArtist.getExternalURL().toString());
+        RefinedArtist mappedRefinedArtist = DownstreamMapper.mapSimpleArtist(simpleSigrid);
+        assertEquals(simpleSigrid.getHref(), mappedRefinedArtist.getHref());
+        assertEquals(simpleSigrid.getId(), mappedRefinedArtist.getId());
+        assertEquals(simpleSigrid.getName(), mappedRefinedArtist.getName());
+        assertEquals(simpleSigrid.getType().toString().toLowerCase(), mappedRefinedArtist.getType());
+        assertEquals(simpleSigrid.getUri(), mappedRefinedArtist.getUri().toString());
+        assertEquals(simpleSigrid.getExternalUrls().get("spotify"), mappedRefinedArtist.getExternalURL().toString());
     }
 
     @Test
     public void mapArtistCorrectly() throws MalformedURLException {
-        finalyearproject.model.Artist mappedArtist = DownstreamMapper.mapArtist(fullSigrid);
-        assertEquals(fullSigrid.getExternalUrls().get("spotify"), mappedArtist.getExternalURL().toString());
-        assertEquals(fullSigrid.getGenres(), mappedArtist.getGenres());
-        assertEquals(fullSigrid.getHref(), mappedArtist.getHref());
-        assertEquals(fullSigrid.getId(), mappedArtist.getId());
-        assertEquals(fullSigrid.getName(), mappedArtist.getName());
-        assertEquals(fullSigrid.getType().toString().toLowerCase(), mappedArtist.getType());
-        assertEquals(fullSigrid.getUri(), mappedArtist.getUri().toString());
-        assertEquals(fullSigrid.getFollowers().getTotal(), mappedArtist.getFollowers());
-        assertEquals(fullSigrid.getPopularity(), mappedArtist.getPopularity());
+        RefinedArtist mappedRefinedArtist = DownstreamMapper.mapArtist(fullSigrid);
+        assertEquals(fullSigrid.getExternalUrls().get("spotify"), mappedRefinedArtist.getExternalURL().toString());
+        assertEquals(fullSigrid.getGenres(), mappedRefinedArtist.getGenres());
+        assertEquals(fullSigrid.getHref(), mappedRefinedArtist.getHref());
+        assertEquals(fullSigrid.getId(), mappedRefinedArtist.getId());
+        assertEquals(fullSigrid.getName(), mappedRefinedArtist.getName());
+        assertEquals(fullSigrid.getType().toString().toLowerCase(), mappedRefinedArtist.getType());
+        assertEquals(fullSigrid.getUri(), mappedRefinedArtist.getUri().toString());
+        assertEquals(fullSigrid.getFollowers().getTotal(), mappedRefinedArtist.getFollowers());
+        assertEquals(fullSigrid.getPopularity(), mappedRefinedArtist.getPopularity());
     }
 }
