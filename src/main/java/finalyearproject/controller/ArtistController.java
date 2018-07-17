@@ -1,6 +1,6 @@
 package finalyearproject.controller;
 
-import finalyearproject.model.Artist;
+import finalyearproject.model.RefinedArtist;
 import finalyearproject.repository.ArtistRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,32 +16,33 @@ public class ArtistController {
     private ArtistRepository artistRepository;
 
     @RequestMapping(value = "artists", method = RequestMethod.GET)
-    public List<Artist> list() {
+    public List<RefinedArtist> list() {
         return artistRepository.findAll();
     }
 
     @RequestMapping(value = "artists", method = RequestMethod.POST)
-    public Artist create(@RequestBody Artist artist) {
-        return artistRepository.saveAndFlush(artist);
+    public RefinedArtist create(@RequestBody RefinedArtist RefinedArtist) {
+        return artistRepository.saveAndFlush(RefinedArtist);
     }
 
     @RequestMapping(value = "artists/{id}", method = RequestMethod.GET)
-    public Artist get(@PathVariable String id) {
+    public RefinedArtist get(@PathVariable String id) {
         return artistRepository.getOne(id);
     }
 
     @RequestMapping(value = "artists/{id}", method = RequestMethod.PUT)
-    public Artist update(@PathVariable String id, @RequestBody Artist artist) {
-        Artist existingArtist = artistRepository.findOne(id);
-        BeanUtils.copyProperties(artist, existingArtist);
-        return artistRepository.saveAndFlush(existingArtist);
+    public RefinedArtist update(@PathVariable String id, @RequestBody RefinedArtist RefinedArtist) {
+        RefinedArtist existingRefinedArtist = artistRepository.findOne(id);
+        BeanUtils.copyProperties(RefinedArtist, existingRefinedArtist);
+        return artistRepository.saveAndFlush(existingRefinedArtist);
     }
 
     @RequestMapping(value = "artists/{id}", method = RequestMethod.DELETE)
-    public Artist delete(@PathVariable String id) {
-        Artist existingArtist = artistRepository.findOne(id);
-        artistRepository.delete(existingArtist);
-        return existingArtist;
+    public RefinedArtist delete(@PathVariable String id) {
+        RefinedArtist existingRefinedArtist = artistRepository.findOne(id);
+        artistRepository.delete(existingRefinedArtist);
+        return existingRefinedArtist;
     }
+
 
 }

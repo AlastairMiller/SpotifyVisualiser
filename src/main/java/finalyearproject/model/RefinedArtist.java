@@ -3,6 +3,7 @@ package finalyearproject.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -15,16 +16,19 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder
-public class Artist {
+public class RefinedArtist {
     @Id
-    String id;
-    URL externalURL;
+    private String id;
+    private URL externalURL;
     @ElementCollection
-    List<String> genres;
-    String href;
-    String name;
-    String type;
-    URI uri;
+    private List<String> genres;
+    private String href;
+    private String name;
+    private String type;
+    private  int followers;
+    private int popularity;
+    private URI uri;
 }
